@@ -1,13 +1,15 @@
-// Whiteout Survivor Calculator - Logic and UI
+// Whiteout Survivor Calculator - Logic
 
 // Constants
 const MIN_LEVEL = 20;
 const MAX_LEVEL = 30;
-const MINUTES_PER_DAY = 1440;
-const MINUTES_PER_HOUR = 60;
+const SECONDS_PER_DAY = 86400;
+const SECONDS_PER_HOUR = 3600;
+const SECONDS_PER_MINUTE = 60;
 
 // Utility functions
 function formatNumber(num) {
+    if (typeof num !== 'number' || isNaN(num)) return '0';
     if (num >= 1000000) {
         return (num / 1000000).toFixed(1) + 'M';
     } else if (num >= 1000) {
@@ -16,10 +18,12 @@ function formatNumber(num) {
     return num.toString();
 }
 
-function formatTime(minutes) {
-    const days = Math.floor(minutes / MINUTES_PER_DAY);
-    const hours = Math.floor((minutes % MINUTES_PER_DAY) / MINUTES_PER_HOUR);
-    const mins = minutes % MINUTES_PER_HOUR;
+function formatTime(seconds) {
+    if (typeof seconds !== 'number' || isNaN(seconds) || seconds < 0) return '0m';
+    
+    const days = Math.floor(seconds / SECONDS_PER_DAY);
+    const hours = Math.floor((seconds % SECONDS_PER_DAY) / SECONDS_PER_HOUR);
+    const mins = Math.floor((seconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE);
     
     if (days > 0) {
         return `${days}d ${hours}h ${mins}m`;
@@ -30,125 +34,86 @@ function formatTime(minutes) {
 }
 
 function applySpeedBoost(time, boostPercentage) {
-    if (boostPercentage > 0) {
-        return Math.floor(time * (boostPercentage / 100));
-    }
-    return time;
+    if (typeof time !== 'number' || isNaN(time) || time < 0) return 0;
+    if (typeof boostPercentage !== 'number' || isNaN(boostPercentage) || boostPercentage <= 0) return time;
+    
+    return Math.floor(time * (boostPercentage / 100));
 }
 
-function calculateBuildingCost(buildingType, level) {
-    let building = gameData.buildings[buildingType];
-    
-    // Handle consolidated shelters
-    if (buildingType.startsWith('shelter') && buildingType !== 'shelterTemplate') {
-        const shelterNumber = parseInt(buildingType.replace('shelter', ''));
-        building = { ...gameData.buildings.shelterTemplate };
-        building.name = `Shelter ${shelterNumber}`;
+function getInputValue(elementId, defaultValue, min = null, max = null) {
+    try {
+        const element = document.getElementById(elementId);
+        if (!element) return defaultValue;
         
-        // Override subcomponent name for even-numbered shelters
-        if (shelterNumber % 2 === 0) {
-            building.subcomponents[1].name = "Desk";
-            building.subcomponents[1].cost.wood = 1000;
-        } else {
-            building.subcomponents[1].name = "Bunk Bed";
-            building.subcomponents[1].cost.wood = 1100;
-        }
+        const value = parseInt(element.value) || defaultValue;
         
-        // Update furnace requirements based on shelter number
-        if (building.levelUpgrades && building.levelUpgrades[2]) {
-            building.levelUpgrades[2].requirements.furnace = gameData.buildings.shelterRequirements[shelterNumber] || shelterNumber;
+        if (min !== null && value < min) return min;
+        if (max !== null && value > max) return max;
+        
+        return value;
+    } catch (error) {
+        console.error(`Error getting input value for ${elementId}:`, error);
+        return defaultValue;
+    }
+}
+
+function setElementText(elementId, text) {
+    try {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = text;
         }
+    } catch (error) {
+        console.error(`Error setting text for ${elementId}:`, error);
     }
-    
-    if (!building) return null;
-    
-    // Ignore inner city buildings
-    if (building.innerCity) {
-        return null;
-    }
-    
-    // Handle one-time cost buildings
-    if (building.oneTimeCost) {
-        if (building.levels && building.levels[1]) {
-            return { ...building.levels[1].requirements };
+}
+
+function setElementDisplay(elementId, display) {
+    try {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.style.display = display;
         }
-        return null;
+    } catch (error) {
+        console.error(`Error setting display for ${elementId}:`, error);
     }
-    
-    // Handle shelter level upgrades
-    if (building.isShelter && building.levelUpgrades && building.levelUpgrades[level]) {
-        return { ...building.levelUpgrades[level].cost };
-    }
-    
-    // Handle buildings with subcomponents
-    if (building.hasSubcomponents && building.subcomponents[level]) {
-        return { ...building.subcomponents[level].cost };
-    }
-    
-    // Handle buildings with explicit levels
-    if (building.levels && building.levels[level]) {
-        return { ...building.levels[level].requirements };
-    }
-    
-    // Fallback to old format if levels don't exist
-    if (building.baseCost && building.multiplier) {
-        const cost = {};
-        for (const resource in building.baseCost) {
-            cost[resource] = Math.floor(building.baseCost[resource] * Math.pow(building.multiplier, level - 1));
-        }
-        return cost;
-    }
-    
-    return null;
 }
 
 // Main calculation function
 function calculateRequirements() {
     try {
-        const currentLevel = parseInt(document.getElementById('current-level').value) || MIN_LEVEL;
-        const constructionSpeedBoost = Math.max(0, Math.min(100, parseInt(document.getElementById('construction-speed').value) || 0));
-        const buildingType = document.getElementById('building-type').value;
-        const targetLevel = parseInt(document.getElementById('building-level').value) || 1;
+        const currentLevel = getInputValue('current-level', MIN_LEVEL, MIN_LEVEL, MAX_LEVEL);
+        const constructionSpeedBoost = getInputValue('construction-speed', 0, 0, 100);
+        const buildingType = document.getElementById('building-type')?.value || 'furnace';
+        const targetLevel = getInputValue('building-level', 1, 1, MAX_LEVEL);
         
         // Validate inputs
-        if (currentLevel < MIN_LEVEL) {
-            alert(`Current level must be at least ${MIN_LEVEL}`);
+        if (currentLevel < MIN_LEVEL || currentLevel > MAX_LEVEL) {
+            alert(`Current level must be between ${MIN_LEVEL} and ${MAX_LEVEL}`);
             return;
         }
         
-        if (currentLevel > targetLevel) {
-            alert('Target level must be higher than or equal to current level');
+        if (targetLevel < 1 || targetLevel > MAX_LEVEL) {
+            alert(`Target level must be between 1 and ${MAX_LEVEL}`);
             return;
         }
         
-        // If current level equals target level, no upgrade needed
-        if (currentLevel === targetLevel) {
-            const netRequirements = {
-                meat: 0,
+        if (currentLevel >= targetLevel) {
+            // Same level or current higher than target - no requirements
+            const requirements = {
+                food: 0,
                 wood: 0,
                 coal: 0,
                 iron: 0,
-                time: 0,
-                dependencies: [],
-                levelRange: { from: currentLevel, to: targetLevel }
+                time: 0
             };
             
-            updateResultsDisplay(netRequirements, constructionSpeedBoost);
-            document.getElementById('results-section').style.display = 'block';
-            
-            // Show message that no upgrade is needed
-            const breakdownDiv = document.getElementById('progress-breakdown');
-            breakdownDiv.innerHTML = `
-                <div class="progress-item summary">
-                    <h4>📊 No Upgrade Required</h4>
-                    <p>You are already at level ${currentLevel}. No resources or time needed.</p>
-                </div>
-            `;
-            
+            updateResultsDisplay(requirements, currentLevel, targetLevel, constructionSpeedBoost);
             return;
         }
         
-        // Initialize cumulative totals
+        // Initialize totals
+        let totalFood = 0;
         let totalMeat = 0;
         let totalWood = 0;
         let totalCoal = 0;
@@ -158,38 +123,47 @@ function calculateRequirements() {
         
         // Calculate cumulative requirements for each level from current to target
         for (let level = currentLevel + 1; level <= targetLevel; level++) {
-            let levelRequirements = { meat: 0, wood: 0, coal: 0, iron: 0, time: 0 };
+            let levelRequirements = { food: 0, wood: 0, coal: 0, iron: 0, time: 0 };
             
             if (buildingType === 'furnace') {
                 // Special handling for furnace with its level-specific requirements
-                if (gameData.buildings.furnace.levels[level]) {
+                if (gameData?.buildings?.furnace?.levels?.[level]) {
                     const levelData = gameData.buildings.furnace.levels[level];
-                    levelRequirements = levelData.requirements;
-                    levelRequirements.time = levelData.time;
+                    levelRequirements = { ...levelData.requirements };
+                    levelRequirements.time = levelData.time || 0;
                     if (levelData.dependencies) {
                         allDependencies = allDependencies.concat(levelData.dependencies);
                     }
                 }
             } else {
-                const buildingCost = calculateBuildingCost(buildingType, level);
-                if (buildingCost) {
-                    levelRequirements = buildingCost;
-                }
+                // For other buildings, use the old calculation method
+                const building = gameData?.buildings?.[buildingType];
+                if (!building) continue;
                 
-                // Get time from levels if available
-                const building = gameData.buildings[buildingType];
-                if (building && building.levels && building.levels[level]) {
-                    levelRequirements.time = building.levels[level].time;
-                    if (building.levels[level].dependencies) {
-                        allDependencies = allDependencies.concat(building.levels[level].dependencies);
+                // Skip inner city buildings
+                if (building.innerCity) continue;
+                
+                // Handle one-time cost buildings
+                if (building.oneTimeCost && level === 1) {
+                    levelRequirements = { ...building.baseCost };
+                } else if (building.levels?.[level]) {
+                    // Use new level-specific data if available
+                    const levelData = building.levels[level];
+                    levelRequirements = { ...levelData.requirements };
+                    levelRequirements.time = levelData.time || 0;
+                } else if (building.baseCost && building.multiplier) {
+                    // Use old multiplier-based calculation
+                    for (const resource in building.baseCost) {
+                        levelRequirements[resource] = Math.floor(building.baseCost[resource] * Math.pow(building.multiplier, level - 1));
                     }
                 }
             }
             
-            // Apply speed boost to this level's time before adding to totals
+            // Apply speed boost to this level's time
             const levelTime = applySpeedBoost(levelRequirements.time || 0, constructionSpeedBoost);
             
-            // Add this level's requirements to totals
+            // Add to totals
+            totalFood += levelRequirements.food || 0;
             totalMeat += levelRequirements.meat || 0;
             totalWood += levelRequirements.wood || 0;
             totalCoal += levelRequirements.coal || 0;
@@ -197,99 +171,226 @@ function calculateRequirements() {
             totalTime += levelTime;
         }
         
+        // Calculate dependent building costs
+        const dependentBuildingCosts = calculateDependentBuildingCosts(allDependencies, constructionSpeedBoost);
+        
+        totalFood += dependentBuildingCosts.food || 0;
+        totalMeat += dependentBuildingCosts.meat || 0;
+        totalWood += dependentBuildingCosts.wood || 0;
+        totalCoal += dependentBuildingCosts.coal || 0;
+        totalIron += dependentBuildingCosts.iron || 0;
+        totalTime += dependentBuildingCosts.time || 0;
+        
+        // Create net requirements object
         const netRequirements = {
-            meat: totalMeat,
+            food: totalFood + totalMeat, // Combine food and meat
             wood: totalWood,
             coal: totalCoal,
             iron: totalIron,
             time: totalTime,
-            dependencies: allDependencies,
-            levelRange: { from: currentLevel + 1, to: targetLevel }
+            dependencies: allDependencies
         };
-        
-        // Update UI
-        updateResultsDisplay(netRequirements, constructionSpeedBoost);
-        
-        // Show results
-        document.getElementById('results-section').style.display = 'block';
-        
-        // Generate progress breakdown
-        generateProgressBreakdown(currentLevel, netRequirements, constructionSpeedBoost);
         
         // Show dependencies if they exist
         if (netRequirements.dependencies && netRequirements.dependencies.length > 0) {
-            generateDependencyBreakdown(netRequirements.dependencies);
+            generateDependencyBreakdown(netRequirements.dependencies, constructionSpeedBoost);
         }
+        
+        // Update the display
+        updateResultsDisplay(netRequirements, currentLevel, targetLevel, constructionSpeedBoost);
+        
     } catch (error) {
         console.error('Error in calculateRequirements:', error);
         alert('An error occurred while calculating requirements. Please try again.');
     }
 }
 
-function updateResultsDisplay(requirements, boostPercentage) {
+function calculateDependentBuildingCosts(dependencies, constructionSpeedBoost) {
     try {
-        document.getElementById('meat-needed').textContent = formatNumber(requirements.meat);
-        document.getElementById('wood-needed').textContent = formatNumber(requirements.wood);
-        document.getElementById('coal-needed').textContent = formatNumber(requirements.coal);
-        document.getElementById('iron-needed').textContent = formatNumber(requirements.iron);
-        
-        // Show time with boost information if applicable
-        if (boostPercentage > 0) {
-            document.getElementById('time-required').textContent = `${formatTime(requirements.time)} (${boostPercentage}% boost applied)`;
-        } else {
-            document.getElementById('time-required').textContent = formatTime(requirements.time);
+        if (!Array.isArray(dependencies) || dependencies.length === 0) {
+            return { food: 0, meat: 0, wood: 0, coal: 0, iron: 0, time: 0 };
         }
+        
+        let totalFood = 0;
+        let totalMeat = 0;
+        let totalWood = 0;
+        let totalCoal = 0;
+        let totalIron = 0;
+        let totalTime = 0;
+        
+        // Process each dependency
+        dependencies.forEach(dep => {
+            if (!dep || typeof dep !== 'object' || !dep.building || typeof dep.level !== 'number') {
+                return;
+            }
+            
+            const buildingType = dep.building;
+            const requiredLevel = dep.level;
+            
+            // Get the building data
+            const building = gameData?.buildings?.[buildingType];
+            if (!building) {
+                return;
+            }
+            
+            // Skip innerCity buildings as they are excluded from calculations
+            if (building.innerCity) {
+                return;
+            }
+            
+            // Calculate the cost for the required level
+            if (building.levels?.[requiredLevel]) {
+                const levelData = building.levels[requiredLevel];
+                const requirements = levelData.requirements || {};
+                
+                totalFood += requirements.food || 0;
+                totalMeat += requirements.meat || 0;
+                totalWood += requirements.wood || 0;
+                totalCoal += requirements.coal || 0;
+                totalIron += requirements.iron || 0;
+                
+                // Apply speed boost to dependent building time
+                const levelTime = applySpeedBoost(levelData.time || 0, constructionSpeedBoost);
+                totalTime += levelTime;
+            }
+        });
+        
+        return {
+            food: totalFood,
+            meat: totalMeat,
+            wood: totalWood,
+            coal: totalCoal,
+            iron: totalIron,
+            time: totalTime
+        };
+    } catch (error) {
+        console.error('Error calculating dependent building costs:', error);
+        return { food: 0, meat: 0, wood: 0, coal: 0, iron: 0, time: 0 };
+    }
+}
+
+function generateDependencyBreakdown(dependencies, constructionSpeedBoost = 0) {
+    try {
+        const dependenciesSection = document.getElementById('dependencies-section');
+        const breakdownDiv = document.getElementById('dependencies-breakdown');
+        
+        if (!dependencies || dependencies.length === 0) {
+            setElementDisplay('dependencies-section', 'none');
+            return;
+        }
+        
+        let html = '<div class="dependency-warning">⚠️ This building requires the following prerequisites (costs included in total):</div>';
+        
+        dependencies.forEach(dep => {
+            if (!dep || typeof dep !== 'object' || !dep.building || typeof dep.level !== 'number') {
+                return;
+            }
+            
+            const buildingType = dep.building;
+            const requiredLevel = dep.level;
+            
+            // Get the building data and calculate actual costs
+            const building = gameData?.buildings?.[buildingType];
+            let cost = { food: 0, meat: 0, wood: 0, coal: 0, iron: 0, time: 0 };
+            let isInnerCity = false;
+            
+            if (building) {
+                isInnerCity = building.innerCity || false;
+                
+                if (building.levels?.[requiredLevel]) {
+                    const levelData = building.levels[requiredLevel];
+                    cost = { ...levelData.requirements };
+                    cost.time = levelData.time || 0;
+                }
+            }
+            
+            const buildingName = building ? building.name : buildingType;
+            const statusText = isInnerCity ? " (Inner City - Cost Not Included)" : " (Cost Included in Total)";
+            const boostedTime = applySpeedBoost(cost.time, constructionSpeedBoost);
+            const boostText = constructionSpeedBoost > 0 ? ` (${constructionSpeedBoost}% boost applied)` : '';
+            
+            html += `
+                <div class="dependency-item">
+                    <div class="dependency-header">
+                        <h4>${buildingName} (Level ${requiredLevel})${statusText}</h4>
+                        <span class="dependency-cost">Cost: ${formatNumber(cost.meat || cost.food || 0)} Meat, ${formatNumber(cost.wood || 0)} Wood, ${formatNumber(cost.coal || 0)} Coal, ${formatNumber(cost.iron || 0)} Iron</span>
+                    </div>
+                    <div class="dependency-details">
+                        <p><strong>Time Required:</strong> ${formatTime(boostedTime)}${boostText}</p>
+                        <p><strong>Resource Breakdown:</strong></p>
+                        <div class="dependency-resources">
+                            <span class="resource-item"><i class="fas fa-utensils"></i> Meat: ${formatNumber(cost.meat || cost.food || 0)}</span>
+                            <span class="resource-item"><i class="fas fa-tree"></i> Wood: ${formatNumber(cost.wood || 0)}</span>
+                            <span class="resource-item"><i class="fas fa-fire"></i> Coal: ${formatNumber(cost.coal || 0)}</span>
+                            <span class="resource-item"><i class="fas fa-hammer"></i> Iron: ${formatNumber(cost.iron || 0)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        if (breakdownDiv) {
+            breakdownDiv.innerHTML = html;
+        }
+        setElementDisplay('dependencies-section', 'block');
+        
+    } catch (error) {
+        console.error('Error generating dependency breakdown:', error);
+    }
+}
+
+function updateResultsDisplay(requirements, currentLevel, targetLevel, boostPercentage) {
+    try {
+        // Update the main results
+        setElementText('meat-needed', formatNumber(requirements.food));
+        setElementText('wood-needed', formatNumber(requirements.wood));
+        setElementText('coal-needed', formatNumber(requirements.coal));
+        setElementText('iron-needed', formatNumber(requirements.iron));
+        setElementText('time-required', formatTime(requirements.time));
+        
+        // Generate progress breakdown
+        generateProgressBreakdown(requirements, currentLevel, targetLevel, boostPercentage);
+        
+        // Show the results section
+        setElementDisplay('results-section', 'block');
+        
     } catch (error) {
         console.error('Error updating results display:', error);
     }
 }
 
-function generateProgressBreakdown(currentLevel, requirements, boostPercentage) {
+function generateProgressBreakdown(requirements, currentLevel, targetLevel, boostPercentage) {
     try {
         const breakdownDiv = document.getElementById('progress-breakdown');
-        const buildingType = document.getElementById('building-type').value;
-        const targetLevel = parseInt(document.getElementById('building-level').value);
+        if (!breakdownDiv) return;
         
         let html = `
             <div class="progress-item summary">
                 <h4>📊 Cumulative Requirements (Level ${currentLevel} → ${targetLevel})</h4>
-                <p><strong>Total:</strong> Meat: ${formatNumber(requirements.meat)} | Wood: ${formatNumber(requirements.wood)} | Coal: ${formatNumber(requirements.coal)} | Iron: ${formatNumber(requirements.iron)} | Time: ${formatTime(requirements.time)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
+                <p><strong>Total (includes dependent building costs):</strong> Meat: ${formatNumber(requirements.food)} | Wood: ${formatNumber(requirements.wood)} | Coal: ${formatNumber(requirements.coal)} | Iron: ${formatNumber(requirements.iron)} | Time: ${formatTime(requirements.time)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
             </div>
         `;
         
-        // Show individual level breakdown
-        if (requirements.levelRange && requirements.levelRange.from <= requirements.levelRange.to) {
+        // Generate level-by-level breakdown
+        if (currentLevel + 1 <= targetLevel) {
             html += '<div class="level-breakdown">';
-            html += '<h5>📋 Level-by-Level Breakdown:</h5>';
+            html += '<h4>📈 Level-by-Level Breakdown:</h4>';
             
-            for (let level = requirements.levelRange.from; level <= requirements.levelRange.to; level++) {
-                let levelRequirements = { meat: 0, wood: 0, coal: 0, iron: 0, time: 0 };
+            for (let level = currentLevel + 1; level <= targetLevel; level++) {
+                let levelRequirements = { food: 0, wood: 0, coal: 0, iron: 0, time: 0 };
                 
-                if (buildingType === 'furnace') {
-                    if (gameData.buildings.furnace.levels[level]) {
-                        const levelData = gameData.buildings.furnace.levels[level];
-                        levelRequirements = levelData.requirements;
-                        levelRequirements.time = levelData.time;
-                    }
-                } else {
-                    const buildingCost = calculateBuildingCost(buildingType, level);
-                    if (buildingCost) {
-                        levelRequirements = buildingCost;
-                    }
-                    
-                    // Get time from levels if available
-                    const building = gameData.buildings[buildingType];
-                    if (building && building.levels && building.levels[level]) {
-                        levelRequirements.time = building.levels[level].time;
-                    }
+                if (gameData?.buildings?.furnace?.levels?.[level]) {
+                    const levelData = gameData.buildings.furnace.levels[level];
+                    levelRequirements = { ...levelData.requirements };
+                    levelRequirements.time = levelData.time || 0;
                 }
                 
-                const displayTime = applySpeedBoost(levelRequirements.time || 0, boostPercentage);
+                const levelTime = applySpeedBoost(levelRequirements.time || 0, boostPercentage);
                 
                 html += `
                     <div class="level-item">
-                        <h6>Level ${level}:</h6>
-                        <p>Meat: ${formatNumber(levelRequirements.meat || 0)} | Wood: ${formatNumber(levelRequirements.wood || 0)} | Coal: ${formatNumber(levelRequirements.coal || 0)} | Iron: ${formatNumber(levelRequirements.iron || 0)} | Time: ${formatTime(displayTime)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
+                        <h5>Level ${level}:</h5>
+                        <p>Meat: ${formatNumber(levelRequirements.meat || 0)} | Wood: ${formatNumber(levelRequirements.wood || 0)} | Coal: ${formatNumber(levelRequirements.coal || 0)} | Iron: ${formatNumber(levelRequirements.iron || 0)} | Time: ${formatTime(levelTime)}</p>
                     </div>
                 `;
             }
@@ -298,54 +399,19 @@ function generateProgressBreakdown(currentLevel, requirements, boostPercentage) 
         }
         
         breakdownDiv.innerHTML = html;
+        
     } catch (error) {
         console.error('Error generating progress breakdown:', error);
     }
 }
 
-function generateDependencyBreakdown(dependencies) {
-    try {
-        const dependenciesSection = document.getElementById('dependencies-section');
-        const breakdownDiv = document.getElementById('dependencies-breakdown');
-        
-        let html = '<div class="dependency-warning">⚠️ This building requires the following prerequisites:</div>';
-        
-        dependencies.forEach(dep => {
-            html += `
-                <div class="dependency-item">
-                    <div class="dependency-header">
-                        <h4>${dep.name} (Level ${dep.requiredLevel})</h4>
-                        <span class="dependency-cost">Total Cost: ${formatNumber(dep.cost.meat)} Meat, ${formatNumber(dep.cost.wood)} Wood, ${formatNumber(dep.cost.coal)} Coal, ${formatNumber(dep.cost.iron)} Iron</span>
-                    </div>
-                    <div class="dependency-details">
-                        <p><strong>Time Required:</strong> ${formatTime(dep.cost.time)}</p>
-                        <p><strong>Resource Breakdown:</strong></p>
-                        <div class="dependency-resources">
-                            <span class="resource-item"><i class="fas fa-utensils"></i> Meat: ${formatNumber(dep.cost.meat)}</span>
-                            <span class="resource-item"><i class="fas fa-tree"></i> Wood: ${formatNumber(dep.cost.wood)}</span>
-                            <span class="resource-item"><i class="fas fa-fire"></i> Coal: ${formatNumber(dep.cost.coal)}</span>
-                            <span class="resource-item"><i class="fas fa-hammer"></i> Iron: ${formatNumber(dep.cost.iron)}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-        
-        breakdownDiv.innerHTML = html;
-        dependenciesSection.style.display = 'block';
-    } catch (error) {
-        console.error('Error generating dependency breakdown:', error);
-    }
-}
-
-// Settings management functions
+// Local storage functions
 function saveSettings() {
     try {
         const settings = {
-            currentLevel: document.getElementById('current-level').value,
-            constructionSpeed: document.getElementById('construction-speed').value,
-            buildingType: 'furnace',
-            buildingLevel: document.getElementById('building-level').value
+            currentLevel: getInputValue('current-level', MIN_LEVEL),
+            targetLevel: getInputValue('building-level', 1),
+            constructionSpeed: getInputValue('construction-speed', 0)
         };
         
         localStorage.setItem('woCalculatorSettings', JSON.stringify(settings));
@@ -354,87 +420,51 @@ function saveSettings() {
     }
 }
 
-function loadSavedSettings() {
+function loadSettings() {
     try {
         const savedSettings = localStorage.getItem('woCalculatorSettings');
         if (savedSettings) {
             const settings = JSON.parse(savedSettings);
             
-            // Restore values
             if (settings.currentLevel) {
-                document.getElementById('current-level').value = settings.currentLevel;
+                const element = document.getElementById('current-level');
+                if (element) element.value = settings.currentLevel;
+            }
+            if (settings.targetLevel) {
+                const element = document.getElementById('building-level');
+                if (element) element.value = settings.targetLevel;
             }
             if (settings.constructionSpeed) {
-                document.getElementById('construction-speed').value = settings.constructionSpeed;
+                const element = document.getElementById('construction-speed');
+                if (element) element.value = settings.constructionSpeed;
             }
-            if (settings.buildingLevel) {
-                document.getElementById('building-level').value = settings.buildingLevel;
-            }
-            
-            // Always set building type to furnace and trigger change event
-            document.getElementById('building-type').value = 'furnace';
-            document.getElementById('building-type').dispatchEvent(new Event('change'));
-        } else {
-            // If no saved settings, set defaults with furnace as main goal
-            document.getElementById('building-type').value = 'furnace';
-            document.getElementById('building-type').dispatchEvent(new Event('change'));
         }
     } catch (error) {
-        console.error('Error loading saved settings:', error);
-        // Set defaults on error
-        document.getElementById('building-type').value = 'furnace';
-        document.getElementById('building-type').dispatchEvent(new Event('change'));
+        console.error('Error loading settings:', error);
     }
 }
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        // Load saved settings from localStorage
-        loadSavedSettings();
+        // Load saved settings
+        loadSettings();
         
-        // Main calculate button
-        document.getElementById('calculate-btn').addEventListener('click', calculateRequirements);
+        // Add event listeners
+        const calculateBtn = document.getElementById('calculate-btn');
+        if (calculateBtn) {
+            calculateBtn.addEventListener('click', calculateRequirements);
+        }
         
-        // Building type change handler
-        document.getElementById('building-type').addEventListener('change', function() {
-            const buildingType = this.value;
-            const buildingLevelInput = document.getElementById('building-level');
-            const levelNote = document.querySelector('.level-note');
-            
-            // This part of the logic needs to be refactored to accept gameData as an argument
-            // For now, it will just set the max level and show/hide the note
-            if (buildingType && gameData.buildings[buildingType]) {
-                const building = gameData.buildings[buildingType];
-                
-                if (building.oneTimeCost) {
-                    buildingLevelInput.value = 1;
-                    buildingLevelInput.max = 1;
-                    buildingLevelInput.disabled = true;
-                    levelNote.style.display = 'none';
-                } else if (building.maxLevel === "furnace") {
-                    buildingLevelInput.disabled = false;
-                    buildingLevelInput.max = MAX_LEVEL;
-                    levelNote.style.display = 'block';
-                } else if (building.maxLevel) {
-                    buildingLevelInput.disabled = false;
-                    buildingLevelInput.max = building.maxLevel;
-                    levelNote.style.display = 'none';
-                } else {
-                    buildingLevelInput.disabled = false;
-                    buildingLevelInput.max = MAX_LEVEL;
-                    levelNote.style.display = 'none';
-                }
+        // Save settings when inputs change
+        const inputs = ['current-level', 'building-level', 'construction-speed'];
+        inputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', saveSettings);
             }
-            
-            saveSettings();
         });
         
-        // Add event listeners to save settings when inputs change
-        const inputsToSave = ['current-level', 'construction-speed', 'building-level'];
-        inputsToSave.forEach(id => {
-            document.getElementById(id).addEventListener('input', saveSettings);
-        });
     } catch (error) {
         console.error('Error in DOMContentLoaded:', error);
     }
