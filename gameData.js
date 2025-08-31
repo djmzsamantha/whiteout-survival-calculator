@@ -428,6 +428,7 @@ const gameData = {
             name: "Furnace",
             maxLevel: 30,
             levels: {
+                1: { requirements: { meat: 0, wood: 0, coal: 0, iron: 0 }, dependencies: [], time: 0 },
                 2: { requirements: { wood: 180 }, dependencies: [{ building: "sawmill", level: 1 }], time: 6 },
                 3: { requirements: { wood: 805 }, dependencies: [{ building: "shelter1", level: 2 }], time: 60 },
                 4: { requirements: { wood: 1800, coal: 360 }, dependencies: [{ building: "coalMine", level: 3 }], time: 180 },
