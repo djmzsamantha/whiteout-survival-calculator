@@ -1,142 +1,108 @@
 # Whiteout Survivor Calculator
 
-A comprehensive web-based calculator for the Whiteout Survivor game that helps players plan their advancement by calculating resource requirements, time estimates, and providing strategic tips.
+A comprehensive web-based calculator for the Whiteout Survivor game that helps players plan their advancement goals and resource requirements.
 
 ## Features
 
-### 🎯 Main Calculator
-- **Building Upgrades**: Plan building upgrades with resource and time calculations
-- **Furnace Progression**: Special handling for furnace's complex leveling system (1-30)
+- **Resource Planning**: Calculate food, wood, coal, iron, and time requirements for building upgrades
+- **Cumulative Calculations**: Plan multiple level upgrades with cumulative resource requirements
+- **Speed Boost Integration**: Account for construction and research speed boosts
+- **Building Dependencies**: View prerequisite building requirements
+- **Game Data Integration**: Accurate data for all buildings including Furnace (levels 1-30)
+- **Persistent Settings**: Remember your preferences across sessions
+- **Responsive Design**: Works on desktop and mobile devices
 
-### 📊 Resource Tracking
-- **Current Status**: Input your current furnace level
-- **Total Requirements**: Shows complete resource needs for your goal
-- **Time Estimates**: Shows how long upgrades will take
+## Game Buildings Supported
 
+### Main Building
+- **Furnace** (Levels 1-30) - The main building that caps all other buildings
 
+### Resource Buildings
+- Coal Mine, Sawmill, Iron Mine, Hunter's Station (all capped by Furnace level)
 
+### Starter Buildings
+- Clinic (Max Level 10)
+- Shelters 1-10 (Max Level 10 each)
+- Cook House (Max Level 10)
 
-### 💡 Smart Tips
-- **Strategic Advice**: Get personalized tips based on your goals and resource bottlenecks
-- **Progress Breakdown**: See detailed requirements for each level or upgrade step
-- **Resource Prioritization**: Learn which resources to focus on first
+### Troop Buildings
+- Infantry Camp, Marksman Camp, Lancer Camp (all capped by Furnace level)
 
-## How to Use
+### Support Buildings
+- Research Center, Storehouse, Infirmary, Embassy, Command Center (all capped by Furnace level)
 
-### 1. Set Your Current Status
-- Enter your current furnace level (1-30)
+### Special Buildings
+- Hero Hall (One-time cost)
+- Barricade (Sporadic leveling)
 
-### 2. Choose Your Goal
-- **Building Upgrade**: Choose building type and target level
+## Live Demo
 
-### 3. Calculate Requirements
-- Click "Calculate Requirements" to see detailed breakdown
-- Review resource needs and time estimates
-- Check the progress breakdown for step-by-step requirements
-- Read strategic tips for your specific situation
+🌐 **Access the calculator**: [https://djmzsamantha.github.io/whiteout-survival-calculator](https://djmzsamantha.github.io/whiteout-survival-calculator)
 
+## Local Development
 
+### Prerequisites
+- Python 3.x (for local server)
+- Modern web browser
 
-## Game Data Included
-
-The calculator includes comprehensive data for:
-- **Furnace Levels 1-30** with complex building dependencies and escalating resource requirements
-- **Starter Buildings** (Max Level 10): Clinic, Shelters 1-10, Cook House
-- **Resource Buildings** (Max Level = Furnace Level): Coal Mine, Sawmill, Iron Mine, Hunter's Station
-- **Troop Buildings** (Max Level = Furnace Level): Infantry Camp, Marksman Camp, Lancer Camp
-- **Support Buildings** (Max Level = Furnace Level): Research Center, Storehouse, Infirmary, Embassy, Command Center, Hero Hall
-- **Defense Buildings** (Max Level = Furnace Level): Barricade
-- **Research Categories**: Growth, Economy, Battle (coming soon)
-
-## Technical Details
-
-- **Pure HTML/CSS/JavaScript**: No external dependencies required
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **Modern UI**: Beautiful winter-themed design with smooth animations
-- **Real-time Calculations**: Instant results with no page reloads
-- **Building Dependencies**: Shows prerequisite buildings needed for upgrades
-
-## Getting Started
-
-### Local Development
-1. Clone the repository: `git clone https://github.com/yourusername/whiteout-survivor-calculator.git`
-2. Navigate to the project directory: `cd whiteout-survivor-calculator`
-3. Start a local server: `python3 -m http.server 8000`
+### Setup
+1. Clone the repository: `git clone https://github.com/djmzsamantha/whiteout-survival-calculator.git`
+2. Navigate to the project directory: `cd whiteout-survival-calculator`
+3. Start the local server: `python3 -m http.server 8000`
 4. Open `http://localhost:8000` in your browser
-5. Start calculating your Whiteout Survivor advancement plans!
-
-### GitHub Pages Deployment
-This project is configured for automatic deployment to GitHub Pages:
-
-1. **Fork or create** a new repository on GitHub
-2. **Push** your code to the `main` branch
-3. **Enable GitHub Pages** in your repository settings:
-   - Go to Settings → Pages
-   - Source: Deploy from a branch
-   - Branch: `gh-pages` (will be created automatically)
-   - Folder: `/ (root)`
-4. **Wait** for the GitHub Action to deploy (usually takes 1-2 minutes)
-5. **Access** your site at `https://yourusername.github.io/whiteout-survivor-calculator`
-
-### Custom Domain (Optional)
-To use a custom domain:
-1. Add your domain to the `CNAME` file
-2. Configure DNS settings with your domain provider
-3. Enable HTTPS in GitHub Pages settings
-
-## File Structure
-
-```
-whiteout-survivor-calculator/
-├── index.html              # Main application file
-├── styles.css              # Styling and responsive design
-├── script.js               # Game logic and calculations
-├── 404.html                # Custom 404 error page
-├── sitemap.xml             # SEO sitemap
-├── robots.txt              # Search engine crawling rules
-├── CNAME                   # Custom domain configuration
-├── .github/workflows/      # GitHub Actions deployment
-│   └── deploy.yml         # Automatic deployment workflow
-├── package.json            # Project metadata and scripts
-├── .gitignore             # Git ignore rules
-└── README.md              # This documentation
-```
-
-## Browser Compatibility
-
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
-- Mobile browsers
-
-## Contributing
-
-Feel free to contribute by:
-- Adding more accurate game data and building costs
-- Improving the UI/UX
-- Adding new calculation features
-- Fixing bugs or issues
-- Updating building dependencies and requirements
 
 ## Deployment
 
-### Automatic Deployment
-This project uses GitHub Actions for automatic deployment:
-- Push to `main` branch triggers deployment
-- Site is automatically built and deployed to GitHub Pages
-- No manual build steps required
+This project is automatically deployed to GitHub Pages using GitHub Actions.
 
-### Manual Deployment
-If you prefer manual deployment:
-1. Build the project (no build step required for static site)
-2. Upload files to your web server
-3. Ensure all files are in the root directory
+### Manual Deployment Steps
+1. **Enable GitHub Pages**:
+   - Go to your repository settings
+   - Navigate to "Pages" section
+   - Select "GitHub Actions" as the source
+
+2. **Push to main branch**:
+   ```bash
+   git add .
+   git commit -m "Update for deployment"
+   git push origin main
+   ```
+
+3. **Monitor deployment**:
+   - Check the "Actions" tab in your repository
+   - Wait for the deployment workflow to complete
+   - **Access** your site at `https://djmzsamantha.github.io/whiteout-survival-calculator`
+
+## Game Data
+
+The calculator includes comprehensive game data for:
+- Building costs and requirements
+- Level progression multipliers
+- Time requirements
+- Building dependencies
+- Resource calculations
+
+All data is based on actual game mechanics and is regularly updated.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make your changes
+4. Commit your changes: `git commit -m 'Add feature'`
+5. Push to the branch: `git push origin feature-name`
+6. Submit a pull request
 
 ## License
 
-This project is open source and available under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For issues, questions, or suggestions:
+- Create an issue on GitHub
+- Contact the developer through the game community
 
 ---
 
-**Happy calculating and good luck in Whiteout Survivor!** 🏔️❄️
+**Note**: This calculator is designed for players level 20+ and assumes the Furnace as the primary building goal.

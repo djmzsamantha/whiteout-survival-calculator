@@ -18,16 +18,16 @@
     "survival",
     "base-building"
   ],
-  "author": "Your Name",
+  "author": "djmzsamantha",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/whiteout-survivor-calculator.git"
+    "url": "https://github.com/djmzsamantha/whiteout-survival-calculator.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/whiteout-survivor-calculator/issues"
+    "url": "https://github.com/djmzsamantha/whiteout-survival-calculator/issues"
   },
-  "homepage": "https://yourusername.github.io/whiteout-survivor-calculator",
+  "homepage": "https://djmzsamantha.github.io/whiteout-survival-calculator",
   "devDependencies": {},
   "dependencies": {}
 }
