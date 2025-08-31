@@ -1,251 +1,4 @@
-// Whiteout Survivor Calculator - Game Data and Logic
-
-// Game data structure with requirements for buildings
-const gameData = {
-    buildings: {
-        // Starter Buildings (max level 10)
-        clinic: {
-            name: "Clinic",
-            baseCost: { food: 50, wood: 100, coal: 20, iron: 30, time: 20 },
-            multiplier: 1.2,
-            dependencies: [],
-            maxLevel: 10,
-            innerCity: true
-        },
-        
-        // Consolidated Shelter Template
-        shelterTemplate: {
-            baseCost: { food: 0, wood: 0, coal: 0, iron: 0, time: 0 },
-            multiplier: 1.1,
-            dependencies: [],
-            maxLevel: 10,
-            hasSubcomponents: true,
-            isShelter: true,
-            innerCity: true,
-            subcomponents: {
-                1: {
-                    name: "Bunk Bed",
-                    cost: { food: 0, wood: 1100, coal: 0, iron: 0, time: 0 }
-                }
-            },
-            levelUpgrades: {
-                2: {
-                    cost: { food: 0, wood: 1080, coal: 0, iron: 0, time: 0 },
-                    requirements: {
-                        furnace: 2,
-                        allSubcomponents: 1
-                    }
-                }
-            }
-        },
-        
-        // Shelter furnace level requirements
-        shelterRequirements: {
-            1: 1, 2: 2, 3: 3, 4: 4, 5: 5,
-            6: 6, 7: 7, 8: 8, 9: 9, 10: 10
-        },
-        
-        cookHouse: {
-            name: "Cook House",
-            baseCost: { food: 0, wood: 1000, coal: 0, iron: 0, time: 2 },
-            multiplier: 1.15,
-            dependencies: [],
-            maxLevel: 10,
-            hasSubcomponents: true,
-            innerCity: true,
-            subcomponents: {
-                1: {
-                    name: "Level 1 Stove",
-                    cost: { food: 0, wood: 929, coal: 0, iron: 0, time: 0 }
-                }
-            }
-        },
-        
-        heroHall: {
-            name: "Hero Hall",
-            baseCost: { food: 0, wood: 7600, coal: 1600, iron: 0, time: 600 },
-            multiplier: 1.0,
-            dependencies: [],
-            maxLevel: 1,
-            oneTimeCost: true,
-            powerBonus: 15500
-        },
-        
-        // Resource Buildings
-        coalMine: {
-            name: "Coal Mine",
-            baseCost: { food: 100, wood: 200, coal: 0, iron: 50, time: 30 },
-            multiplier: 1.3,
-            dependencies: [],
-            maxLevel: "furnace",
-            innerCity: true
-        },
-        
-        sawmill: {
-            name: "Sawmill", 
-            baseCost: { food: 0, wood: 1080, coal: 0, iron: 0, time: 6 },
-            multiplier: 1.3,
-            dependencies: [],
-            maxLevel: "furnace",
-            hasSubcomponents: true,
-            innerCity: true,
-            subcomponents: {
-                1: {
-                    name: "Workbench",
-                    cost: { food: 0, wood: 0, coal: 0, iron: 0, time: 0, meat: 2800 }
-                }
-            }
-        },
-        
-        ironMine: {
-            name: "Iron Mine",
-            baseCost: { food: 200, wood: 150, coal: 300, iron: 0, time: 60 },
-            multiplier: 1.4,
-            dependencies: [],
-            maxLevel: "furnace",
-            innerCity: true
-        },
-        
-        huntersStation: {
-            name: "Hunter's Station",
-            baseCost: { food: 0, wood: 20, coal: 0, iron: 0, time: 2 },
-            multiplier: 1.2,
-            dependencies: [],
-            maxLevel: "furnace",
-            hasSubcomponents: true,
-            isShelter: true,
-            innerCity: true,
-            subcomponents: {
-                1: { name: "Hunter's Station", cost: { food: 0, wood: 15, coal: 0, iron: 0, time: 0 } },
-                2: { name: "Hunter's Station", cost: { food: 0, wood: 25, coal: 0, iron: 0, time: 0 } },
-                3: { name: "Hunter's Station", cost: { food: 0, wood: 30, coal: 0, iron: 0, time: 0 } },
-                4: { name: "Hunter's Station", cost: { food: 0, wood: 35, coal: 0, iron: 0, time: 0 } }
-            },
-            levelUpgrades: {
-                2: {
-                    cost: { food: 0, wood: 45, coal: 0, iron: 0, time: 3 },
-                    requirements: { furnace: 2, allSubcomponents: 2 }
-                },
-                3: {
-                    cost: { food: 0, wood: 0, coal: 0, iron: 0, time: 0 },
-                    requirements: { allSubcomponents: 4 }
-                }
-            }
-        },
-        
-        // Troop Buildings
-        infantryCamp: {
-            name: "Infantry Camp",
-            baseCost: { food: 200, wood: 150, coal: 100, iron: 250, time: 120 },
-            multiplier: 1.5,
-            dependencies: [],
-            maxLevel: "furnace"
-        },
-        
-        marksmanCamp: {
-            name: "Marksman Camp",
-            baseCost: { food: 180, wood: 200, coal: 80, iron: 300, time: 140 },
-            multiplier: 1.6,
-            dependencies: [],
-            maxLevel: "furnace"
-        },
-        
-        lancerCamp: {
-            name: "Lancer Camp",
-            baseCost: { food: 250, wood: 120, coal: 150, iron: 400, time: 160 },
-            multiplier: 1.7,
-            dependencies: [],
-            maxLevel: "furnace"
-        },
-        
-        // Support Buildings
-        researchCenter: {
-            name: "Research Center",
-            baseCost: { food: 300, wood: 250, coal: 200, iron: 350, time: 180 },
-            multiplier: 1.8,
-            dependencies: [],
-            maxLevel: "furnace"
-        },
-        
-        storehouse: {
-            name: "Storehouse",
-            baseCost: { food: 150, wood: 300, coal: 100, iron: 200, time: 90 },
-            multiplier: 1.4,
-            dependencies: [],
-            maxLevel: "furnace"
-        },
-        
-        infirmary: {
-            name: "Infirmary",
-            baseCost: { food: 250, wood: 180, coal: 120, iron: 280, time: 150 },
-            multiplier: 1.6,
-            dependencies: [],
-            maxLevel: "furnace"
-        },
-        
-        embassy: {
-            name: "Embassy",
-            baseCost: { food: 400, wood: 300, coal: 250, iron: 450, time: 200 },
-            multiplier: 1.9,
-            dependencies: [],
-            maxLevel: "furnace"
-        },
-        
-        commandCenter: {
-            name: "Command Center",
-            baseCost: { food: 500, wood: 400, coal: 300, iron: 500, time: 240 },
-            multiplier: 2.0,
-            dependencies: [],
-            maxLevel: "furnace"
-        },
-        
-        barricade: {
-            name: "Barricade",
-            baseCost: { food: 100, wood: 500, coal: 50, iron: 200, time: 60 },
-            multiplier: 1.3,
-            dependencies: [],
-            maxLevel: "furnace",
-            sporadicLeveling: true
-        },
-        
-        // Main Building
-        furnace: {
-            name: "Furnace",
-            maxLevel: 30,
-            levels: {
-                2: { requirements: { wood: 180 }, dependencies: [{ building: "sawmill", level: 1 }], time: 6 },
-                3: { requirements: { wood: 805 }, dependencies: [{ building: "shelter1", level: 2 }], time: 60 },
-                4: { requirements: { wood: 1800, coal: 360 }, dependencies: [{ building: "coalMine", level: 3 }], time: 180 },
-                5: { requirements: { wood: 7600, coal: 1500 }, dependencies: [{ building: "heroHall", level: 1 }, { building: "shelter3", level: 3 }], time: 600 },
-                6: { requirements: { wood: 19000, coal: 3800, iron: 960 }, dependencies: [{ building: "ironMine", level: 5 }], time: 1800 },
-                7: { requirements: { wood: 69000, coal: 13000, iron: 3400 }, dependencies: [{ building: "huntersStation", level: 6 }], time: 3600 },
-                8: { requirements: { wood: 120000, coal: 25000, iron: 6300 }, dependencies: [{ building: "infantryCamp", level: 7 }], time: 9000 },
-                9: { requirements: { wood: 260000, coal: 52000, iron: 13000 }, dependencies: [{ building: "embassy", level: 8 }, { building: "infirmary", level: 1 }], time: 16200 },
-                10: { requirements: { wood: 460000, coal: 92000, iron: 23000 }, dependencies: [{ building: "marksmanCamp", level: 9 }, { building: "researchCenter", level: 1 }], time: 21600 },
-                11: { requirements: { meat: 1300000, wood: 1300000, coal: 260000, iron: 65000 }, dependencies: [{ building: "embassy", level: 10 }, { building: "lancerCamp", level: 10 }], time: 27000 },
-                12: { requirements: { meat: 1600000, wood: 1600000, coal: 330000, iron: 84000 }, dependencies: [{ building: "embassy", level: 11 }, { building: "commandCenter", level: 1 }], time: 32400 },
-                13: { requirements: { meat: 2300000, wood: 2300000, coal: 470000, iron: 110000 }, dependencies: [{ building: "embassy", level: 12 }, { building: "infantryCamp", level: 12 }], time: 39600 },
-                14: { requirements: { meat: 3100000, wood: 3100000, coal: 640000, iron: 150000 }, dependencies: [{ building: "embassy", level: 13 }, { building: "marksmanCamp", level: 13 }], time: 50400 },
-                15: { requirements: { meat: 4600000, wood: 4600000, coal: 930000, iron: 230000 }, dependencies: [{ building: "embassy", level: 14 }, { building: "lancerCamp", level: 14 }], time: 64800 },
-                16: { requirements: { meat: 5900000, wood: 5900000, coal: 1100000, iron: 290000 }, dependencies: [{ building: "embassy", level: 15 }, { building: "researchCenter", level: 15 }], time: 109680 },
-                17: { requirements: { meat: 9300000, wood: 9300000, coal: 1800000, iron: 460000 }, dependencies: [{ building: "embassy", level: 16 }, { building: "infantryCamp", level: 16 }], time: 131040 },
-                18: { requirements: { meat: 12000000, wood: 12000000, coal: 2500000, iron: 620000 }, dependencies: [{ building: "embassy", level: 17 }, { building: "marksmanCamp", level: 17 }], time: 158340 },
-                19: { requirements: { meat: 15000000, wood: 15000000, coal: 3100000, iron: 780000 }, dependencies: [{ building: "embassy", level: 18 }, { building: "lancerCamp", level: 18 }], time: 239400 },
-                20: { requirements: { meat: 21000000, wood: 21000000, coal: 4300000, iron: 1000000 }, dependencies: [{ building: "embassy", level: 19 }, { building: "researchCenter", level: 19 }], time: 295080 },
-                21: { requirements: { meat: 27000000, wood: 27000000, coal: 5400000, iron: 1300000 }, dependencies: [{ building: "embassy", level: 20 }, { building: "infantryCamp", level: 20 }], time: 383940 },
-                22: { requirements: { meat: 36000000, wood: 36000000, coal: 7200000, iron: 1800000 }, dependencies: [{ building: "embassy", level: 21 }, { building: "marksmanCamp", level: 21 }], time: 576000 },
-                23: { requirements: { meat: 44000000, wood: 44000000, coal: 8900000, iron: 2200000 }, dependencies: [{ building: "embassy", level: 22 }, { building: "lancerCamp", level: 22 }], time: 811200 },
-                24: { requirements: { meat: 60000000, wood: 60000000, coal: 12000000, iron: 3000000 }, dependencies: [{ building: "embassy", level: 23 }, { building: "researchCenter", level: 23 }], time: 18873 },
-                25: { requirements: { meat: 81000000, wood: 81000000, coal: 16000000, iron: 4000000 }, dependencies: [{ building: "embassy", level: 24 }, { building: "infantryCamp", level: 24 }], time: 26422 },
-                26: { requirements: { meat: 100000000, wood: 100000000, coal: 21000000, iron: 5200000 }, dependencies: [{ building: "embassy", level: 25 }, { building: "marksmanCamp", level: 25 }], time: 30386 },
-                27: { requirements: { meat: 140000000, wood: 140000000, coal: 24000000, iron: 7400000 }, dependencies: [{ building: "embassy", level: 26 }, { building: "lancerCamp", level: 26 }], time: 36463 },
-                28: { requirements: { meat: 190000000, wood: 190000000, coal: 39000000, iron: 9900000 }, dependencies: [{ building: "embassy", level: 27 }, { building: "researchCenter", level: 27 }], time: 41932 },
-                29: { requirements: { meat: 240000000, wood: 240000000, coal: 49000000, iron: 12000000 }, dependencies: [{ building: "embassy", level: 28 }, { building: "infantryCamp", level: 28 }], time: 48102 },
-                30: { requirements: { meat: 300000000, wood: 300000000, coal: 60000000, iron: 15000000 }, dependencies: [{ building: "embassy", level: 29 }, { building: "marksmanCamp", level: 29 }], time: 57867 }
-            }
-        }
-    }
-};
+// Whiteout Survivor Calculator - Logic and UI
 
 // Constants
 const MIN_LEVEL = 20;
@@ -316,7 +69,10 @@ function calculateBuildingCost(buildingType, level) {
     
     // Handle one-time cost buildings
     if (building.oneTimeCost) {
-        return { ...building.baseCost };
+        if (building.levels && building.levels[1]) {
+            return { ...building.levels[1].requirements };
+        }
+        return null;
     }
     
     // Handle shelter level upgrades
@@ -329,11 +85,21 @@ function calculateBuildingCost(buildingType, level) {
         return { ...building.subcomponents[level].cost };
     }
     
-    const cost = {};
-    for (const resource in building.baseCost) {
-        cost[resource] = Math.floor(building.baseCost[resource] * Math.pow(building.multiplier, level - 1));
+    // Handle buildings with explicit levels
+    if (building.levels && building.levels[level]) {
+        return { ...building.levels[level].requirements };
     }
-    return cost;
+    
+    // Fallback to old format if levels don't exist
+    if (building.baseCost && building.multiplier) {
+        const cost = {};
+        for (const resource in building.baseCost) {
+            cost[resource] = Math.floor(building.baseCost[resource] * Math.pow(building.multiplier, level - 1));
+        }
+        return cost;
+    }
+    
+    return null;
 }
 
 // Main calculation function
@@ -358,7 +124,7 @@ function calculateRequirements() {
         // If current level equals target level, no upgrade needed
         if (currentLevel === targetLevel) {
             const netRequirements = {
-                food: 0,
+                meat: 0,
                 wood: 0,
                 coal: 0,
                 iron: 0,
@@ -383,7 +149,6 @@ function calculateRequirements() {
         }
         
         // Initialize cumulative totals
-        let totalFood = 0;
         let totalMeat = 0;
         let totalWood = 0;
         let totalCoal = 0;
@@ -393,7 +158,7 @@ function calculateRequirements() {
         
         // Calculate cumulative requirements for each level from current to target
         for (let level = currentLevel + 1; level <= targetLevel; level++) {
-            let levelRequirements = { food: 0, wood: 0, coal: 0, iron: 0, time: 0 };
+            let levelRequirements = { meat: 0, wood: 0, coal: 0, iron: 0, time: 0 };
             
             if (buildingType === 'furnace') {
                 // Special handling for furnace with its level-specific requirements
@@ -410,13 +175,21 @@ function calculateRequirements() {
                 if (buildingCost) {
                     levelRequirements = buildingCost;
                 }
+                
+                // Get time from levels if available
+                const building = gameData.buildings[buildingType];
+                if (building && building.levels && building.levels[level]) {
+                    levelRequirements.time = building.levels[level].time;
+                    if (building.levels[level].dependencies) {
+                        allDependencies = allDependencies.concat(building.levels[level].dependencies);
+                    }
+                }
             }
             
             // Apply speed boost to this level's time before adding to totals
             const levelTime = applySpeedBoost(levelRequirements.time || 0, constructionSpeedBoost);
             
             // Add this level's requirements to totals
-            totalFood += levelRequirements.food || 0;
             totalMeat += levelRequirements.meat || 0;
             totalWood += levelRequirements.wood || 0;
             totalCoal += levelRequirements.coal || 0;
@@ -425,7 +198,7 @@ function calculateRequirements() {
         }
         
         const netRequirements = {
-            food: totalFood + totalMeat,
+            meat: totalMeat,
             wood: totalWood,
             coal: totalCoal,
             iron: totalIron,
@@ -455,7 +228,7 @@ function calculateRequirements() {
 
 function updateResultsDisplay(requirements, boostPercentage) {
     try {
-        document.getElementById('food-needed').textContent = formatNumber(requirements.food);
+        document.getElementById('meat-needed').textContent = formatNumber(requirements.meat);
         document.getElementById('wood-needed').textContent = formatNumber(requirements.wood);
         document.getElementById('coal-needed').textContent = formatNumber(requirements.coal);
         document.getElementById('iron-needed').textContent = formatNumber(requirements.iron);
@@ -480,7 +253,7 @@ function generateProgressBreakdown(currentLevel, requirements, boostPercentage) 
         let html = `
             <div class="progress-item summary">
                 <h4>📊 Cumulative Requirements (Level ${currentLevel} → ${targetLevel})</h4>
-                <p><strong>Total:</strong> Meat: ${formatNumber(requirements.food)} | Wood: ${formatNumber(requirements.wood)} | Coal: ${formatNumber(requirements.coal)} | Iron: ${formatNumber(requirements.iron)} | Time: ${formatTime(requirements.time)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
+                <p><strong>Total:</strong> Meat: ${formatNumber(requirements.meat)} | Wood: ${formatNumber(requirements.wood)} | Coal: ${formatNumber(requirements.coal)} | Iron: ${formatNumber(requirements.iron)} | Time: ${formatTime(requirements.time)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
             </div>
         `;
         
@@ -490,7 +263,7 @@ function generateProgressBreakdown(currentLevel, requirements, boostPercentage) 
             html += '<h5>📋 Level-by-Level Breakdown:</h5>';
             
             for (let level = requirements.levelRange.from; level <= requirements.levelRange.to; level++) {
-                let levelRequirements = { food: 0, wood: 0, coal: 0, iron: 0, time: 0 };
+                let levelRequirements = { meat: 0, wood: 0, coal: 0, iron: 0, time: 0 };
                 
                 if (buildingType === 'furnace') {
                     if (gameData.buildings.furnace.levels[level]) {
@@ -503,6 +276,12 @@ function generateProgressBreakdown(currentLevel, requirements, boostPercentage) 
                     if (buildingCost) {
                         levelRequirements = buildingCost;
                     }
+                    
+                    // Get time from levels if available
+                    const building = gameData.buildings[buildingType];
+                    if (building && building.levels && building.levels[level]) {
+                        levelRequirements.time = building.levels[level].time;
+                    }
                 }
                 
                 const displayTime = applySpeedBoost(levelRequirements.time || 0, boostPercentage);
@@ -510,7 +289,7 @@ function generateProgressBreakdown(currentLevel, requirements, boostPercentage) 
                 html += `
                     <div class="level-item">
                         <h6>Level ${level}:</h6>
-                        <p>Meat: ${formatNumber(levelRequirements.food || 0)} | Wood: ${formatNumber(levelRequirements.wood || 0)} | Coal: ${formatNumber(levelRequirements.coal || 0)} | Iron: ${formatNumber(levelRequirements.iron || 0)} | Time: ${formatTime(displayTime)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
+                        <p>Meat: ${formatNumber(levelRequirements.meat || 0)} | Wood: ${formatNumber(levelRequirements.wood || 0)} | Coal: ${formatNumber(levelRequirements.coal || 0)} | Iron: ${formatNumber(levelRequirements.iron || 0)} | Time: ${formatTime(displayTime)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
                     </div>
                 `;
             }
@@ -536,13 +315,13 @@ function generateDependencyBreakdown(dependencies) {
                 <div class="dependency-item">
                     <div class="dependency-header">
                         <h4>${dep.name} (Level ${dep.requiredLevel})</h4>
-                        <span class="dependency-cost">Total Cost: ${formatNumber(dep.cost.food)} Meat, ${formatNumber(dep.cost.wood)} Wood, ${formatNumber(dep.cost.coal)} Coal, ${formatNumber(dep.cost.iron)} Iron</span>
+                        <span class="dependency-cost">Total Cost: ${formatNumber(dep.cost.meat)} Meat, ${formatNumber(dep.cost.wood)} Wood, ${formatNumber(dep.cost.coal)} Coal, ${formatNumber(dep.cost.iron)} Iron</span>
                     </div>
                     <div class="dependency-details">
                         <p><strong>Time Required:</strong> ${formatTime(dep.cost.time)}</p>
                         <p><strong>Resource Breakdown:</strong></p>
                         <div class="dependency-resources">
-                            <span class="resource-item"><i class="fas fa-utensils"></i> Meat: ${formatNumber(dep.cost.food)}</span>
+                            <span class="resource-item"><i class="fas fa-utensils"></i> Meat: ${formatNumber(dep.cost.meat)}</span>
                             <span class="resource-item"><i class="fas fa-tree"></i> Wood: ${formatNumber(dep.cost.wood)}</span>
                             <span class="resource-item"><i class="fas fa-fire"></i> Coal: ${formatNumber(dep.cost.coal)}</span>
                             <span class="resource-item"><i class="fas fa-hammer"></i> Iron: ${formatNumber(dep.cost.iron)}</span>
@@ -623,6 +402,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const buildingLevelInput = document.getElementById('building-level');
             const levelNote = document.querySelector('.level-note');
             
+            // This part of the logic needs to be refactored to accept gameData as an argument
+            // For now, it will just set the max level and show/hide the note
             if (buildingType && gameData.buildings[buildingType]) {
                 const building = gameData.buildings[buildingType];
                 

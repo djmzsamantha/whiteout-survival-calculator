@@ -304,14 +304,12 @@ body::before {
     color: #1a237e;
 }
 
-/* Progress and Tips Sections */
-.progress-section,
-.tips-section {
+/* Progress Section */
+.progress-section {
     margin-top: 30px;
 }
 
-.progress-section h3,
-.tips-section h3 {
+.progress-section h3 {
     color: #1a237e;
     margin-bottom: 15px;
     font-size: 1.2rem;
@@ -321,8 +319,7 @@ body::before {
     gap: 10px;
 }
 
-.progress-section h3 i,
-.tips-section h3 i {
+.progress-section h3 i {
     color: #1976d2;
 }
 
@@ -400,34 +397,7 @@ body::before {
     margin: 0;
 }
 
-/* Tips Content */
-.tips-content {
-    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-    padding: 20px;
-    border-radius: 15px;
-    border: 1px solid #ce93d8;
-    position: relative;
-    overflow: hidden;
-}
 
-.tip-item {
-    margin-bottom: 15px;
-    padding-left: 20px;
-    position: relative;
-    color: #2c3e50;
-    font-weight: 500;
-}
-
-.tip-item:before {
-    content: "💡";
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
-.tip-item:last-child {
-    margin-bottom: 0;
-}
 
 /* Dependencies Section */
 .dependencies-section {

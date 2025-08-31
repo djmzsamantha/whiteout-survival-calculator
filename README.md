@@ -4,7 +4,7 @@ A comprehensive web-based calculator for the Whiteout Survivor game that helps p
 
 ## Features
 
-- **Resource Planning**: Calculate food, wood, coal, iron, and time requirements for building upgrades
+- **Resource Planning**: Calculate meat, wood, coal, iron, and time requirements for building upgrades
 - **Cumulative Calculations**: Plan multiple level upgrades with cumulative resource requirements
 - **Speed Boost Integration**: Account for construction and research speed boosts
 - **Building Dependencies**: View prerequisite building requirements
@@ -106,3 +106,22 @@ For issues, questions, or suggestions:
 ---
 
 **Note**: This calculator is designed for players level 20+ and assumes the Furnace as the primary building goal.
+
+## File Structure
+
+```
+whiteout-survivor-calculator/
+├── index.html              # Main application file
+├── styles.css              # Styling and responsive design
+├── script.js               # Game logic and calculations
+├── gameData.js             # Game data and building requirements
+├── 404.html                # Custom 404 error page
+├── sitemap.xml             # SEO sitemap
+├── robots.txt              # Search engine crawling rules
+├── CNAME                   # Custom domain configuration
+├── .github/workflows/      # GitHub Actions deployment
+│   └── deploy.yml         # Automatic deployment workflow
+├── package.json            # Project metadata and scripts
+├── .gitignore             # Git ignore rules
+└── README.md              # This documentation
+```
