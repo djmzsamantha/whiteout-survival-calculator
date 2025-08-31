@@ -311,7 +311,9 @@ const gameData = {
                 7: { requirements: { meat: 10206, wood: 8501, coal: 6801, iron: 11903 }, dependencies: [], time: 6124 },
                 8: { requirements: { meat: 18371, wood: 15302, coal: 12242, iron: 21425 }, dependencies: [], time: 11023 },
                 9: { requirements: { meat: 33068, wood: 27544, coal: 22035, iron: 38565 }, dependencies: [], time: 19841 },
-                10: { requirements: { meat: 59522, wood: 49579, coal: 39663, iron: 69417 }, dependencies: [], time: 35714 }
+                10: { requirements: { meat: 59522, wood: 49579, coal: 39663, iron: 69417 }, dependencies: [], time: 35714 },
+                27: { requirements: { meat: 59000000, wood: 59000000, coal: 11000000, iron: 2900000 }, dependencies: [{ building: "furnace", level: 27 }], time: 328140 }
+
             }
         },
         
@@ -453,7 +455,7 @@ const gameData = {
                 26: { requirements: { meat: 100000000, wood: 100000000, coal: 21000000, iron: 5200000 }, dependencies: [{ building: "embassy", level: 25 }, { building: "marksmanCamp", level: 25 }], time: 30386 },
                 27: { requirements: { meat: 140000000, wood: 140000000, coal: 24000000, iron: 7400000 }, dependencies: [{ building: "embassy", level: 26 }, { building: "lancerCamp", level: 26 }], time: 36463 },
                 28: { requirements: { meat: 190000000, wood: 190000000, coal: 39000000, iron: 9900000 }, dependencies: [{ building: "embassy", level: 27 }, { building: "researchCenter", level: 27 }], time: 41932 },
-                29: { requirements: { meat: 240000000, wood: 240000000, coal: 49000000, iron: 12000000 }, dependencies: [{ building: "embassy", level: 28 }, { building: "infantryCamp", level: 28 }], time: 48102 },
+                29: { requirements: { meat: 240000000, wood: 240000000, coal: 49000000, iron: 12000000 }, dependencies: [{ building: "embassy", level: 28 }, { building: "infantryCamp", level: 28 }], time: 2893320 },
                 30: { requirements: { meat: 300000000, wood: 300000000, coal: 60000000, iron: 15000000 }, dependencies: [{ building: "embassy", level: 29 }, { building: "marksmanCamp", level: 29 }], time: 57867 }
             }
         }
