@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whiteout Survivor Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-snowflake"></i> Whiteout Survivor Calculator</h1>
+            <p>Calculate requirements for advancement goals</p>
+        </header>
+
+        <!-- Current Status Bar -->
+        <div class="status-bar">
+            <div class="status-content">
+                <div class="status-item">
+                    <i class="fas fa-mountain"></i>
+                    <label for="current-level">Current Level:</label>
+                    <input type="number" id="current-level" min="20" max="30" value="20">
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-hammer"></i>
+                    <label for="construction-speed">Construction Speed Boost (%):</label>
+                    <input type="number" id="construction-speed" min="0" max="100" value="0" placeholder="0">
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-flask"></i>
+                    <label for="research-speed">Research Speed Boost (%):</label>
+                    <input type="number" id="research-speed" min="0" max="100" value="0" placeholder="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Calculator Grid -->
+        <div class="calculator-grid">
+            <!-- Goal Selection Section -->
+            <div class="card goal-selection">
+                <h2><i class="fas fa-target"></i> Goal Selection</h2>
+
+
+                <div class="form-group">
+                    <label for="building-type">Building Type:</label>
+                    <select id="building-type">
+                        <optgroup label="Main Building">
+                            <option value="furnace" selected>Furnace</option>
+                        </optgroup>
+                        <optgroup label="Other Buildings">
+                            <option value="infantry-camp">Infantry Camp</option>
+                            <option value="marksman-camp">Marksman Camp</option>
+                            <option value="lancer-camp">Lancer Camp</option>
+                            <option value="research-center">Research Center</option>
+                            <option value="storehouse">Storehouse</option>
+                            <option value="infirmary">Infirmary</option>
+                            <option value="embassy">Embassy</option>
+                            <option value="command-center">Command Center</option>
+                            <option value="hero-hall">Hero Hall (One-time Cost)</option>
+                            <option value="barricade">Barricade (Sporadic Leveling)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="building-level">Target Level:</label>
+                    <input type="number" id="building-level" min="1" max="30" value="1">
+                    <small class="level-note" style="display: none; color: #1976d2; font-size: 0.85rem; margin-top: 5px;">
+                        Note: Resource buildings cannot exceed Furnace level
+                    </small>
+                </div>
+                <button id="calculate-btn" class="btn-primary">
+                    <i class="fas fa-calculator"></i> Calculate Requirements
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card results" id="results-section" style="display: none;">
+                <h2><i class="fas fa-chart-bar"></i> Requirements Summary</h2>
+                <div class="requirements-container">
+                    <div class="requirements-header">
+                        <h3>Resource Requirements</h3>
+                    </div>
+                    <div class="requirements-content">
+                        <div class="resource-row">
+                            <i class="fas fa-utensils"></i>
+                            <span class="label">Food/Meat:</span>
+                            <span class="value" id="food-needed">0</span>
+                        </div>
+                        <div class="resource-row">
+                            <i class="fas fa-tree"></i>
+                            <span class="label">Wood:</span>
+                            <span class="value" id="wood-needed">0</span>
+                        </div>
+                        <div class="resource-row">
+                            <i class="fas fa-fire"></i>
+                            <span class="label">Coal:</span>
+                            <span class="value" id="coal-needed">0</span>
+                        </div>
+                        <div class="resource-row">
+                            <i class="fas fa-hammer"></i>
+                            <span class="label">Iron:</span>
+                            <span class="value" id="iron-needed">0</span>
+                        </div>
+                        <div class="resource-row">
+                            <i class="fas fa-clock"></i>
+                            <span class="label">Time:</span>
+                            <span class="value" id="time-required">0h 0m</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progress-section">
+                    <h3>Progress Breakdown</h3>
+                    <div id="progress-breakdown"></div>
+                </div>
+
+                <div class="dependencies-section" id="dependencies-section" style="display: none;">
+                    <h3><i class="fas fa-link"></i> Prerequisite Buildings</h3>
+                    <div id="dependencies-breakdown"></div>
+                </div>
+
+                <div class="tips-section">
+                    <h3><i class="fas fa-lightbulb"></i> Tips & Strategies</h3>
+                    <div id="tips-content"></div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
