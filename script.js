@@ -340,7 +340,7 @@ function calculateBuildingCost(buildingType, level) {
 function calculateRequirements() {
     try {
         const currentLevel = parseInt(document.getElementById('current-level').value) || MIN_LEVEL;
-        const constructionSpeedBoost = parseInt(document.getElementById('construction-speed').value) || 0;
+        const constructionSpeedBoost = Math.max(0, Math.min(100, parseInt(document.getElementById('construction-speed').value) || 0));
         const buildingType = document.getElementById('building-type').value;
         const targetLevel = parseInt(document.getElementById('building-level').value) || 1;
         
@@ -379,7 +379,6 @@ function calculateRequirements() {
                 </div>
             `;
             
-            generateTips(netRequirements);
             return;
         }
         
@@ -444,9 +443,6 @@ function calculateRequirements() {
         // Generate progress breakdown
         generateProgressBreakdown(currentLevel, netRequirements, constructionSpeedBoost);
         
-        // Generate tips
-        generateTips(netRequirements);
-        
         // Show dependencies if they exist
         if (netRequirements.dependencies && netRequirements.dependencies.length > 0) {
             generateDependencyBreakdown(netRequirements.dependencies);
@@ -484,7 +480,7 @@ function generateProgressBreakdown(currentLevel, requirements, boostPercentage) 
         let html = `
             <div class="progress-item summary">
                 <h4>📊 Cumulative Requirements (Level ${currentLevel} → ${targetLevel})</h4>
-                <p><strong>Total:</strong> Food/Meat: ${formatNumber(requirements.food)} | Wood: ${formatNumber(requirements.wood)} | Coal: ${formatNumber(requirements.coal)} | Iron: ${formatNumber(requirements.iron)} | Time: ${formatTime(requirements.time)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
+                <p><strong>Total:</strong> Meat: ${formatNumber(requirements.food)} | Wood: ${formatNumber(requirements.wood)} | Coal: ${formatNumber(requirements.coal)} | Iron: ${formatNumber(requirements.iron)} | Time: ${formatTime(requirements.time)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
             </div>
         `;
         
@@ -514,7 +510,7 @@ function generateProgressBreakdown(currentLevel, requirements, boostPercentage) 
                 html += `
                     <div class="level-item">
                         <h6>Level ${level}:</h6>
-                        <p>Food/Meat: ${formatNumber(levelRequirements.food || 0)} | Wood: ${formatNumber(levelRequirements.wood || 0)} | Coal: ${formatNumber(levelRequirements.coal || 0)} | Iron: ${formatNumber(levelRequirements.iron || 0)} | Time: ${formatTime(displayTime)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
+                        <p>Meat: ${formatNumber(levelRequirements.food || 0)} | Wood: ${formatNumber(levelRequirements.wood || 0)} | Coal: ${formatNumber(levelRequirements.coal || 0)} | Iron: ${formatNumber(levelRequirements.iron || 0)} | Time: ${formatTime(displayTime)}${boostPercentage > 0 ? ` (${boostPercentage}% boost applied)` : ''}</p>
                     </div>
                 `;
             }
@@ -525,15 +521,6 @@ function generateProgressBreakdown(currentLevel, requirements, boostPercentage) 
         breakdownDiv.innerHTML = html;
     } catch (error) {
         console.error('Error generating progress breakdown:', error);
-    }
-}
-
-function generateTips(requirements) {
-    try {
-        const tipsDiv = document.getElementById('tips-content');
-        tipsDiv.innerHTML = '<div class="tip-item">Message Velouria to have a tip listed here.</div>';
-    } catch (error) {
-        console.error('Error generating tips:', error);
     }
 }
 
@@ -549,13 +536,13 @@ function generateDependencyBreakdown(dependencies) {
                 <div class="dependency-item">
                     <div class="dependency-header">
                         <h4>${dep.name} (Level ${dep.requiredLevel})</h4>
-                        <span class="dependency-cost">Total Cost: ${formatNumber(dep.cost.food)} Food, ${formatNumber(dep.cost.wood)} Wood, ${formatNumber(dep.cost.coal)} Coal, ${formatNumber(dep.cost.iron)} Iron</span>
+                        <span class="dependency-cost">Total Cost: ${formatNumber(dep.cost.food)} Meat, ${formatNumber(dep.cost.wood)} Wood, ${formatNumber(dep.cost.coal)} Coal, ${formatNumber(dep.cost.iron)} Iron</span>
                     </div>
                     <div class="dependency-details">
                         <p><strong>Time Required:</strong> ${formatTime(dep.cost.time)}</p>
                         <p><strong>Resource Breakdown:</strong></p>
                         <div class="dependency-resources">
-                            <span class="resource-item"><i class="fas fa-utensils"></i> Food: ${formatNumber(dep.cost.food)}</span>
+                            <span class="resource-item"><i class="fas fa-utensils"></i> Meat: ${formatNumber(dep.cost.food)}</span>
                             <span class="resource-item"><i class="fas fa-tree"></i> Wood: ${formatNumber(dep.cost.wood)}</span>
                             <span class="resource-item"><i class="fas fa-fire"></i> Coal: ${formatNumber(dep.cost.coal)}</span>
                             <span class="resource-item"><i class="fas fa-hammer"></i> Iron: ${formatNumber(dep.cost.iron)}</span>
@@ -578,7 +565,6 @@ function saveSettings() {
         const settings = {
             currentLevel: document.getElementById('current-level').value,
             constructionSpeed: document.getElementById('construction-speed').value,
-            researchSpeed: document.getElementById('research-speed').value,
             buildingType: 'furnace',
             buildingLevel: document.getElementById('building-level').value
         };
@@ -601,9 +587,6 @@ function loadSavedSettings() {
             }
             if (settings.constructionSpeed) {
                 document.getElementById('construction-speed').value = settings.constructionSpeed;
-            }
-            if (settings.researchSpeed) {
-                document.getElementById('research-speed').value = settings.researchSpeed;
             }
             if (settings.buildingLevel) {
                 document.getElementById('building-level').value = settings.buildingLevel;
@@ -667,7 +650,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Add event listeners to save settings when inputs change
-        const inputsToSave = ['current-level', 'construction-speed', 'research-speed', 'building-level'];
+        const inputsToSave = ['current-level', 'construction-speed', 'building-level'];
         inputsToSave.forEach(id => {
             document.getElementById(id).addEventListener('input', saveSettings);
         });

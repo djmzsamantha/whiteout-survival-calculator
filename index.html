@@ -12,7 +12,7 @@
     <div class="container">
         <header class="header">
             <h1><i class="fas fa-snowflake"></i> Whiteout Survivor Calculator</h1>
-            <p>This site is in development and no values are verified. Use at own risk</p>
+            <p style="color: #000000 !important; padding: 0 8px; margin: 0;">This site is in development and no values are verified. Use at own risk</p>
         </header>
 
         <!-- Current Status Bar -->
@@ -45,22 +45,8 @@
 
                 <div class="form-group">
                     <label for="building-type">Building Type:</label>
-                    <select id="building-type">
-                        <optgroup label="Main Building">
-                            <option value="furnace" selected>Furnace</option>
-                        </optgroup>
-                        <optgroup label="Other Buildings">
-                            <option value="infantry-camp">Infantry Camp</option>
-                            <option value="marksman-camp">Marksman Camp</option>
-                            <option value="lancer-camp">Lancer Camp</option>
-                            <option value="research-center">Research Center</option>
-                            <option value="storehouse">Storehouse</option>
-                            <option value="infirmary">Infirmary</option>
-                            <option value="embassy">Embassy</option>
-                            <option value="command-center">Command Center</option>
-                            <option value="hero-hall">Hero Hall (One-time Cost)</option>
-                            <option value="barricade">Barricade (Sporadic Leveling)</option>
-                        </optgroup>
+                    <select id="building-type" disabled>
+                        <option value="furnace" selected>Furnace (Only building with verified data)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -85,7 +71,7 @@
                     <div class="requirements-content">
                         <div class="resource-row">
                             <i class="fas fa-utensils"></i>
-                            <span class="label">Food/Meat:</span>
+                            <span class="label">Meat:</span>
                             <span class="value" id="food-needed">0</span>
                         </div>
                         <div class="resource-row">
@@ -121,10 +107,7 @@
                     <div id="dependencies-breakdown"></div>
                 </div>
 
-                <div class="tips-section">
-                    <h3><i class="fas fa-lightbulb"></i> Tips & Strategies</h3>
-                    <div id="tips-content"></div>
-                </div>
+
             </div>
         </div>
 
