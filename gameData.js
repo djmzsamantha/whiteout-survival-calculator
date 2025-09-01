@@ -3,79 +3,6 @@
 // Game data structure with requirements for buildings
 const gameData = {
     buildings: {
-        // Starter Buildings (max level 10)
-        clinic: {
-            name: "Clinic",
-            maxLevel: 10,
-            levels: {
-                1: { requirements: { meat: 50, wood: 100, coal: 20, iron: 30 }, dependencies: [], time: 20 },
-                2: { requirements: { meat: 60, wood: 120, coal: 24, iron: 36 }, dependencies: [], time: 24 },
-                3: { requirements: { meat: 72, wood: 144, coal: 29, iron: 43 }, dependencies: [], time: 29 },
-                4: { requirements: { meat: 86, wood: 173, coal: 35, iron: 52 }, dependencies: [], time: 35 },
-                5: { requirements: { meat: 103, wood: 208, coal: 42, iron: 62 }, dependencies: [], time: 42 },
-                6: { requirements: { meat: 124, wood: 250, coal: 50, iron: 74 }, dependencies: [], time: 50 },
-                7: { requirements: { meat: 149, wood: 300, coal: 60, iron: 89 }, dependencies: [], time: 60 },
-                8: { requirements: { meat: 179, wood: 360, coal: 72, iron: 107 }, dependencies: [], time: 72 },
-                9: { requirements: { meat: 215, wood: 432, coal: 86, iron: 128 }, dependencies: [], time: 86 },
-                10: { requirements: { meat: 258, wood: 518, coal: 103, iron: 154 }, dependencies: [], time: 103 }
-            },
-            innerCity: true
-        },
-        
-        // Consolidated Shelter Template
-        shelterTemplate: {
-            name: "Shelter Template",
-            maxLevel: 10,
-            hasSubcomponents: true,
-            isShelter: true,
-            innerCity: true,
-            subcomponents: {
-                1: {
-                    name: "Bunk Bed",
-                    cost: { meat: 0, wood: 1100, coal: 0, iron: 0, time: 0 }
-                }
-            },
-            levelUpgrades: {
-                2: {
-                    cost: { meat: 0, wood: 1080, coal: 0, iron: 0, time: 0 },
-                    requirements: {
-                        furnace: 2,
-                        allSubcomponents: 1
-                    }
-                }
-            }
-        },
-        
-        // Shelter furnace level requirements
-        shelterRequirements: {
-            1: 1, 2: 2, 3: 3, 4: 4, 5: 5,
-            6: 6, 7: 7, 8: 8, 9: 9, 10: 10
-        },
-        
-        cookHouse: {
-            name: "Cook House",
-            maxLevel: 10,
-            hasSubcomponents: true,
-            innerCity: true,
-            subcomponents: {
-                1: {
-                    name: "Level 1 Stove",
-                    cost: { meat: 0, wood: 929, coal: 0, iron: 0, time: 0 }
-                }
-            },
-            levels: {
-                1: { requirements: { meat: 0, wood: 1000, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                2: { requirements: { meat: 0, wood: 1150, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                3: { requirements: { meat: 0, wood: 1323, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                4: { requirements: { meat: 0, wood: 1521, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                5: { requirements: { meat: 0, wood: 1749, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                6: { requirements: { meat: 0, wood: 2011, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                7: { requirements: { meat: 0, wood: 2313, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                8: { requirements: { meat: 0, wood: 2660, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                9: { requirements: { meat: 0, wood: 3059, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                10: { requirements: { meat: 0, wood: 3518, coal: 0, iron: 0 }, dependencies: [], time: 2 }
-            }
-        },
         
         heroHall: {
             name: "Hero Hall",
@@ -84,104 +11,6 @@ const gameData = {
             powerBonus: 15500,
             levels: {
                 1: { requirements: { meat: 0, wood: 7600, coal: 1600, iron: 0 }, dependencies: [], time: 600 }
-            }
-        },
-        
-        // Resource Buildings
-        coalMine: {
-            name: "Coal Mine",
-            maxLevel: "furnace",
-            innerCity: true,
-            levels: {
-                1: { requirements: { meat: 100, wood: 200, coal: 0, iron: 50 }, dependencies: [], time: 30 },
-                2: { requirements: { meat: 130, wood: 260, coal: 0, iron: 65 }, dependencies: [], time: 39 },
-                3: { requirements: { meat: 169, wood: 338, coal: 0, iron: 85 }, dependencies: [], time: 51 },
-                4: { requirements: { meat: 220, wood: 439, coal: 0, iron: 110 }, dependencies: [], time: 66 },
-                5: { requirements: { meat: 286, wood: 571, coal: 0, iron: 143 }, dependencies: [], time: 86 },
-                6: { requirements: { meat: 372, wood: 743, coal: 0, iron: 186 }, dependencies: [], time: 112 },
-                7: { requirements: { meat: 483, wood: 966, coal: 0, iron: 242 }, dependencies: [], time: 146 },
-                8: { requirements: { meat: 628, wood: 1256, coal: 0, iron: 314 }, dependencies: [], time: 190 },
-                9: { requirements: { meat: 816, wood: 1633, coal: 0, iron: 408 }, dependencies: [], time: 247 },
-                10: { requirements: { meat: 1061, wood: 2123, coal: 0, iron: 531 }, dependencies: [], time: 321 }
-            }
-        },
-        
-        sawmill: {
-            name: "Sawmill", 
-            maxLevel: "furnace",
-            hasSubcomponents: true,
-            innerCity: true,
-            subcomponents: {
-                1: {
-                    name: "Workbench",
-                    cost: { meat: 2800, wood: 0, coal: 0, iron: 0, time: 0 }
-                }
-            },
-            levels: {
-                1: { requirements: { meat: 0, wood: 1080, coal: 0, iron: 0 }, dependencies: [], time: 6 },
-                2: { requirements: { meat: 0, wood: 1404, coal: 0, iron: 0 }, dependencies: [], time: 8 },
-                3: { requirements: { meat: 0, wood: 1825, coal: 0, iron: 0 }, dependencies: [], time: 10 },
-                4: { requirements: { meat: 0, wood: 2373, coal: 0, iron: 0 }, dependencies: [], time: 13 },
-                5: { requirements: { meat: 0, wood: 3085, coal: 0, iron: 0 }, dependencies: [], time: 17 },
-                6: { requirements: { meat: 0, wood: 4010, coal: 0, iron: 0 }, dependencies: [], time: 22 },
-                7: { requirements: { meat: 0, wood: 5213, coal: 0, iron: 0 }, dependencies: [], time: 29 },
-                8: { requirements: { meat: 0, wood: 6777, coal: 0, iron: 0 }, dependencies: [], time: 38 },
-                9: { requirements: { meat: 0, wood: 8810, coal: 0, iron: 0 }, dependencies: [], time: 49 },
-                10: { requirements: { meat: 0, wood: 11453, coal: 0, iron: 0 }, dependencies: [], time: 64 }
-            }
-        },
-        
-        ironMine: {
-            name: "Iron Mine",
-            maxLevel: "furnace",
-            innerCity: true,
-            levels: {
-                1: { requirements: { meat: 200, wood: 150, coal: 300, iron: 0 }, dependencies: [], time: 60 },
-                2: { requirements: { meat: 280, wood: 210, coal: 420, iron: 0 }, dependencies: [], time: 84 },
-                3: { requirements: { meat: 392, wood: 294, coal: 588, iron: 0 }, dependencies: [], time: 118 },
-                4: { requirements: { meat: 549, wood: 412, coal: 823, iron: 0 }, dependencies: [], time: 165 },
-                5: { requirements: { meat: 768, wood: 576, coal: 1152, iron: 0 }, dependencies: [], time: 231 },
-                6: { requirements: { meat: 1075, wood: 807, coal: 1613, iron: 0 }, dependencies: [], time: 323 },
-                7: { requirements: { meat: 1505, wood: 1129, coal: 2258, iron: 0 }, dependencies: [], time: 452 },
-                8: { requirements: { meat: 2107, wood: 1581, coal: 3161, iron: 0 }, dependencies: [], time: 633 },
-                9: { requirements: { meat: 2950, wood: 2213, coal: 4426, iron: 0 }, dependencies: [], time: 886 },
-                10: { requirements: { meat: 4130, wood: 3098, coal: 6196, iron: 0 }, dependencies: [], time: 1240 }
-            }
-        },
-        
-        huntersStation: {
-            name: "Hunter's Station",
-            maxLevel: "furnace",
-            hasSubcomponents: true,
-            isShelter: true,
-            innerCity: true,
-            subcomponents: {
-                1: { name: "Hunter's Station", cost: { meat: 0, wood: 15, coal: 0, iron: 0, time: 0 } },
-                2: { name: "Hunter's Station", cost: { meat: 0, wood: 25, coal: 0, iron: 0, time: 0 } },
-                3: { name: "Hunter's Station", cost: { meat: 0, wood: 30, coal: 0, iron: 0, time: 0 } },
-                4: { name: "Hunter's Station", cost: { meat: 0, wood: 35, coal: 0, iron: 0, time: 0 } }
-            },
-            levelUpgrades: {
-                2: {
-                    cost: { meat: 0, wood: 45, coal: 0, iron: 0, time: 3 },
-                    requirements: { furnace: 2, allSubcomponents: 2 }
-                },
-                3: {
-                    cost: { meat: 0, wood: 0, coal: 0, iron: 0, time: 0 },
-                    requirements: { allSubcomponents: 4 }
-                }
-            },
-            levels: {
-                1: { requirements: { meat: 0, wood: 20, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                2: { requirements: { meat: 0, wood: 24, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                3: { requirements: { meat: 0, wood: 29, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                4: { requirements: { meat: 0, wood: 35, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                5: { requirements: { meat: 0, wood: 42, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                6: { requirements: { meat: 0, wood: 50, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                7: { requirements: { meat: 0, wood: 60, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                8: { requirements: { meat: 0, wood: 72, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                9: { requirements: { meat: 0, wood: 86, coal: 0, iron: 0 }, dependencies: [], time: 2 },
-                10: { requirements: { meat: 0, wood: 103, coal: 0, iron: 0 }, dependencies: [], time: 2 }
             }
         },
         
@@ -302,18 +131,36 @@ const gameData = {
             name: "Research Center",
             maxLevel: "furnace",
             levels: {
-                1: { requirements: { meat: 300, wood: 250, coal: 200, iron: 350 }, dependencies: [], time: 180 },
-                2: { requirements: { meat: 540, wood: 450, coal: 360, iron: 630 }, dependencies: [], time: 324 },
-                3: { requirements: { meat: 972, wood: 810, coal: 648, iron: 1134 }, dependencies: [], time: 583 },
-                4: { requirements: { meat: 1750, wood: 1458, coal: 1166, iron: 2041 }, dependencies: [], time: 1050 },
-                5: { requirements: { meat: 3150, wood: 2624, coal: 2099, iron: 3674 }, dependencies: [], time: 1890 },
-                6: { requirements: { meat: 5670, wood: 4723, coal: 3778, iron: 6613 }, dependencies: [], time: 3402 },
-                7: { requirements: { meat: 10206, wood: 8501, coal: 6801, iron: 11903 }, dependencies: [], time: 6124 },
-                8: { requirements: { meat: 18371, wood: 15302, coal: 12242, iron: 21425 }, dependencies: [], time: 11023 },
-                9: { requirements: { meat: 33068, wood: 27544, coal: 22035, iron: 38565 }, dependencies: [], time: 19841 },
-                10: { requirements: { meat: 59522, wood: 49579, coal: 39663, iron: 69417 }, dependencies: [], time: 35714 },
-                27: { requirements: { meat: 59000000, wood: 59000000, coal: 11000000, iron: 2900000 }, dependencies: [{ building: "furnace", level: 27 }], time: 328140 }
-
+                 1: { requirements: { meat: 0, wood: 105, coal: 0, iron: 0 }, dependencies: [{ building: "furnace", level: 9 }], time: 2 },
+                 2: { requirements: { meat: 0, wood: 160, coal: 0, iron: 0 }, dependencies: [{ building: "furnace", level: 9 }], time: 9 },
+                 3: { requirements: { meat: 0, wood: 725, coal: 0, iron: 0 }, dependencies: [{ building: "furnace", level: 9 }], time: 45 },
+                 4: { requirements: { meat: 0, wood: 1600, coal: 320, iron: 0 }, dependencies: [{ building: "furnace", level: 9 }], time: 135 },
+                 5: { requirements: { meat: 0, wood: 6800, coal: 1300, iron: 0 }, dependencies: [{ building: "furnace", level: 9 }], time: 270 },
+                 6: { requirements: { meat: 0, wood: 17000, coal: 3400, iron: 860 }, dependencies: [{ building: "furnace", level: 9 }], time: 540 },
+                 7: { requirements: { meat: 0, wood: 62000, coal: 12000, iron: 3100 }, dependencies: [{ building: "furnace", level: 9 }], time: 1080 },
+                 8: { requirements: { meat: 0, wood: 110000, coal: 22000, iron: 5600 }, dependencies: [{ building: "furnace", level: 9 }], time: 1620 },
+                 9: { requirements: { meat: 0, wood: 230000, coal: 47000, iron: 11000 }, dependencies: [{ building: "furnace", level: 9 }], time: 2430 },
+                 10: { requirements: { meat: 0, wood: 410000, coal: 82000, iron: 20000 }, dependencies: [{ building: "furnace", level: 10 }], time: 3240 },
+                11: { requirements: { meat: 520000, wood: 520000, coal: 100000, iron: 26000 }, dependencies: [{ building: "furnace", level: 11 }], time: 4050 },
+                12: { requirements: { meat: 670000, wood: 670000, coal: 130000, iron: 33000 }, dependencies: [{ building: "furnace", level: 12 }], time: 4860 },
+                13: { requirements: { meat: 950000, wood: 950000, coal: 190000, iron: 47000 }, dependencies: [{ building: "furnace", level: 13 }], time: 5940 },
+                14: { requirements: { meat: 1200000, wood: 1200000, coal: 250000, iron: 63000 }, dependencies: [{ building: "furnace", level: 14 }], time: 7560 },
+                15: { requirements: { meat: 1800000, wood: 1800000, coal: 370000, iron: 93000 }, dependencies: [{ building: "furnace", level: 15 }], time: 9720 },
+                16: { requirements: { meat: 2300000, wood: 2300000, coal: 470000, iron: 110000 }, dependencies: [{ building: "furnace", level: 16 }], time: 16440 },
+                17: { requirements: { meat: 3700000, wood: 3700000, coal: 740000, iron: 180000 }, dependencies: [{ building: "furnace", level: 17 }], time: 19740 },
+                18: { requirements: { meat: 5000000, wood: 5000000, coal: 1000000, iron: 250000 }, dependencies: [{ building: "furnace", level: 18 }], time: 23700 },
+                19: { requirements: { meat: 6200000, wood: 6200000, coal: 1200000, iron: 310000 }, dependencies: [{ building: "furnace", level: 19 }], time: 35550 },
+                20: { requirements: { meat: 8600000, wood: 8600000, coal: 1700000, iron: 430000 }, dependencies: [{ building: "furnace", level: 20 }], time: 44430 },
+                21: { requirements: { meat: 10000000, wood: 10000000, coal: 2100000, iron: 540000 }, dependencies: [{ building: "furnace", level: 21 }], time: 57750 },
+                22: { requirements: { meat: 14000000, wood: 14000000, coal: 2800000, iron: 720000 }, dependencies: [{ building: "furnace", level: 22 }], time: 86640 },
+                23: { requirements: { meat: 17000000, wood: 17000000, coal: 3500000, iron: 890000 }, dependencies: [{ building: "furnace", level: 23 }], time: 120120 },
+                24: { requirements: { meat: 24000000, wood: 24000000, coal: 4800000, iron: 1200000 }, dependencies: [{ building: "furnace", level: 24 }], time: 169860 },
+                25: { requirements: { meat: 32000000, wood: 32000000, coal: 6500000, iron: 1600000 }, dependencies: [{ building: "furnace", level: 25 }], time: 151380 },
+                26: { requirements: { meat: 42000000, wood: 42000000, coal: 8400000, iron: 2100000 }, dependencies: [{ building: "furnace", level: 26 }], time: 271020 },
+                27: { requirements: { meat: 59000000, wood: 59000000, coal: 11000000, iron: 2900000 }, dependencies: [{ building: "furnace", level: 27 }], time: 328140 },
+                28: { requirements: { meat: 79000000, wood: 79000000, coal: 15000000, iron: 3900000 }, dependencies: [{ building: "furnace", level: 28 }], time: 374940 },
+                29: { requirements: { meat: 98000000, wood: 98000000, coal: 19000000, iron: 4900000 }, dependencies: [{ building: "furnace", level: 29 }], time: 432180 },
+                30: { requirements: { meat: 120000000, wood: 120000000, coal: 24000000, iron: 6000000 }, dependencies: [{ building: "furnace", level: 30 }], time: 520800 }
             }
         },
         
@@ -450,13 +297,13 @@ const gameData = {
                 21: { requirements: { meat: 27000000, wood: 27000000, coal: 5400000, iron: 1300000 }, dependencies: [{ building: "embassy", level: 20 }, { building: "infantryCamp", level: 20 }], time: 383940 },
                 22: { requirements: { meat: 36000000, wood: 36000000, coal: 7200000, iron: 1800000 }, dependencies: [{ building: "embassy", level: 21 }, { building: "marksmanCamp", level: 21 }], time: 576000 },
                 23: { requirements: { meat: 44000000, wood: 44000000, coal: 8900000, iron: 2200000 }, dependencies: [{ building: "embassy", level: 22 }, { building: "lancerCamp", level: 22 }], time: 811200 },
-                24: { requirements: { meat: 60000000, wood: 60000000, coal: 12000000, iron: 3000000 }, dependencies: [{ building: "embassy", level: 23 }, { building: "researchCenter", level: 23 }], time: 18873 },
-                25: { requirements: { meat: 81000000, wood: 81000000, coal: 16000000, iron: 4000000 }, dependencies: [{ building: "embassy", level: 24 }, { building: "infantryCamp", level: 24 }], time: 26422 },
-                26: { requirements: { meat: 100000000, wood: 100000000, coal: 21000000, iron: 5200000 }, dependencies: [{ building: "embassy", level: 25 }, { building: "marksmanCamp", level: 25 }], time: 30386 },
-                27: { requirements: { meat: 140000000, wood: 140000000, coal: 24000000, iron: 7400000 }, dependencies: [{ building: "embassy", level: 26 }, { building: "lancerCamp", level: 26 }], time: 36463 },
-                28: { requirements: { meat: 190000000, wood: 190000000, coal: 39000000, iron: 9900000 }, dependencies: [{ building: "embassy", level: 27 }, { building: "researchCenter", level: 27 }], time: 41932 },
+                24: { requirements: { meat: 60000000, wood: 60000000, coal: 12000000, iron: 3000000 }, dependencies: [{ building: "embassy", level: 23 }, { building: "researchCenter", level: 23 }], time: 1129980 },
+                25: { requirements: { meat: 81000000, wood: 81000000, coal: 16000000, iron: 4000000 }, dependencies: [{ building: "embassy", level: 24 }, { building: "infantryCamp", level: 24 }], time: 1592520 },
+                26: { requirements: { meat: 100000000, wood: 100000000, coal: 21000000, iron: 5200000 }, dependencies: [{ building: "embassy", level: 25 }, { building: "marksmanCamp", level: 25 }], time: 1825560 },
+                27: { requirements: { meat: 140000000, wood: 140000000, coal: 24000000, iron: 7400000 }, dependencies: [{ building: "embassy", level: 26 }, { building: "lancerCamp", level: 26 }], time: 2192580 },
+                28: { requirements: { meat: 190000000, wood: 190000000, coal: 39000000, iron: 9900000 }, dependencies: [{ building: "embassy", level: 27 }, { building: "researchCenter", level: 27 }], time: 2511720 },
                 29: { requirements: { meat: 240000000, wood: 240000000, coal: 49000000, iron: 12000000 }, dependencies: [{ building: "embassy", level: 28 }, { building: "infantryCamp", level: 28 }], time: 2893320 },
-                30: { requirements: { meat: 300000000, wood: 300000000, coal: 60000000, iron: 15000000 }, dependencies: [{ building: "embassy", level: 29 }, { building: "marksmanCamp", level: 29 }], time: 57867 }
+                30: { requirements: { meat: 300000000, wood: 300000000, coal: 60000000, iron: 15000000 }, dependencies: [{ building: "embassy", level: 29 }, { building: "marksmanCamp", level: 29 }], time: 3472020 }
             }
         }
     }

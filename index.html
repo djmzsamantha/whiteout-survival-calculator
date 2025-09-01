@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
     <title>Whiteout Survivor Calculator</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -20,49 +20,68 @@
             <p style="color: #000000 !important; padding: 0 8px; margin: 0;">This site is in development and no values are verified. Use at own risk</p>
         </header>
 
-        <!-- Current Status Bar -->
-        <div class="status-bar">
-            <div class="status-content">
-                <div class="status-item">
-                    <i class="fas fa-mountain"></i>
-                    <label for="current-level">Current Level:</label>
-                    <input type="number" id="current-level" min="20" max="30" value="20">
+        <!-- Input and Goal Section -->
+        <!-- Main Layout Container -->
+        <div class="main-layout">
+            <!-- User Information Section -->
+            <div class="card status-bar">
+                <h2><i class="fas fa-user"></i> User Information</h2>
+                <div class="status-content">
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <i class="fas fa-mountain"></i>
+                            <label for="current-level">Current Level:</label>
+                            <input type="number" id="current-level" min="15" max="30" value="15">
+                            <small id="current-level-help">Min: 15</small>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-hammer"></i>
+                            <label for="construction-speed">Construction Speed (%):</label>
+                            <input type="number" id="construction-speed" min="0" max="100" step="0.1" value="0" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-shield-alt"></i>
+                            <label for="zinman-level">Zinman Level:</label>
+                            <input type="number" id="zinman-level" min="0" max="5" value="0">
+                            <small>-3% cost/level</small>
+                        </div>
+                        <div class="input-group ministry-group">
+                            <div class="ministry-header">
+                                <i class="fas fa-medal"></i>
+                                <label>Ministry Benefits:</label>
+                            </div>
+                            <div class="checkbox-row">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="vice-president" value="vice-president">
+                                    VP (+10%)
+                                </label>
+                                <label class="checkbox-label disabled">
+                                    <input type="checkbox" id="minister-education" value="minister-education" disabled>
+                                    Min. Ed.
+                                </label>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-bolt"></i>
+                            <label for="chief-order-double-time">Chief Order: Double Time:</label>
+                            <input type="checkbox" id="chief-order-double-time" value="chief-order-double-time">
+                            <small>+20% construction speed</small>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-target"></i>
+                            <label for="building-level">Target Furnace Level:</label>
+                            <input type="number" id="building-level" min="1" max="30" value="1">
+                        </div>
+                        <div class="input-group">
+                            <button id="calculate-btn" class="btn-primary" type="button" aria-label="Calculate resource requirements">
+                                <i class="fas fa-calculator" aria-hidden="true"></i> Calculate Requirements
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="status-item">
-                    <i class="fas fa-hammer"></i>
-                    <label for="construction-speed">Construction Speed Boost (%):</label>
-                    <input type="number" id="construction-speed" min="0" max="100" value="0" placeholder="0">
-                </div>
-
             </div>
-        </div>
 
-        <!-- Main Calculator Grid -->
-        <div class="calculator-grid">
-            <!-- Goal Selection Section -->
-            <div class="card goal-selection">
-                <h2><i class="fas fa-target"></i> Goal Selection</h2>
-
-
-                <div class="form-group">
-                    <label for="building-type">Building Type:</label>
-                    <select id="building-type" disabled>
-                        <option value="furnace" selected>Furnace</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="building-level">Target Level:</label>
-                    <input type="number" id="building-level" min="1" max="30" value="1">
-                    <small class="level-note" style="display: none; color: #1976d2; font-size: 0.85rem; margin-top: 5px;">
-                        Note: Resource buildings cannot exceed Furnace level
-                    </small>
-                </div>
-                <button id="calculate-btn" class="btn-primary">
-                    <i class="fas fa-calculator"></i> Calculate Requirements
-                </button>
-            </div>
-
-            <!-- Results Section -->
+            <!-- Requirements Summary Section -->
             <div class="card results" id="results-section" style="display: none;">
                 <h2><i class="fas fa-chart-bar"></i> Requirements Summary</h2>
                 <div class="requirements-container">
@@ -107,8 +126,6 @@
                     <h3><i class="fas fa-link"></i> Prerequisite Buildings</h3>
                     <div id="dependencies-breakdown"></div>
                 </div>
-
-
             </div>
         </div>
 
