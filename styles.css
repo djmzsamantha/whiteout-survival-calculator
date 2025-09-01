@@ -459,6 +459,66 @@ button#reset-btn:hover,
     color: #1a237e;
 }
 
+/* Boost Section */
+.boost-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.boost-section h3 {
+    color: #1a237e;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.boost-section h3 i {
+    color: #1976d2;
+}
+
+.boost-breakdown {
+    background: linear-gradient(135deg, #f8f9ff 0%, #e3f2fd 100%);
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #1976d2;
+}
+
+.boost-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.boost-item:last-child {
+    border-bottom: none;
+}
+
+.boost-label {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.boost-value {
+    font-weight: 600;
+    color: #1976d2;
+}
+
+.boost-total {
+    background: rgba(25, 118, 210, 0.1);
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 10px;
+    font-weight: 600;
+    color: #1976d2;
+    text-align: center;
+}
+
 /* Progress Section */
 .progress-section {
     margin-top: 30px;

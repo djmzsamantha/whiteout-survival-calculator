@@ -37,11 +37,11 @@
                         <div class="input-group">
                             <i class="fas fa-hammer"></i>
                             <label for="construction-speed">Construction Speed (%):</label>
-                            <input type="number" id="construction-speed" min="0" max="100" step="0.1" value="0" placeholder="0">
+                            <input type="number" id="construction-speed" min="0" max="100" step="0.01" value="0" placeholder="0.00">
                         </div>
                         <div class="input-group">
                             <i class="fas fa-shield-alt"></i>
-                            <label for="zinman-level">Zinman Level:</label>
+                            <label for="zinman-level">Zinman Bastionist Skill:</label>
                             <input type="number" id="zinman-level" min="0" max="5" value="0">
                             <small>-3% cost/level</small>
                         </div>
@@ -55,10 +55,7 @@
                                     <input type="checkbox" id="vice-president" value="vice-president">
                                     VP (+10%)
                                 </label>
-                                <label class="checkbox-label disabled">
-                                    <input type="checkbox" id="minister-education" value="minister-education" disabled>
-                                    Min. Ed.
-                                </label>
+                                
                             </div>
                         </div>
                         <div class="input-group">
@@ -97,7 +94,7 @@
                         <div class="resource-row">
                             <i class="fas fa-utensils"></i>
                             <span class="label">Meat:</span>
-                            <span class="value" id="meat-needed">0</span>
+                            <span class="value" id="food-needed">0</span>
                         </div>
                         <div class="resource-row">
                             <i class="fas fa-tree"></i>
@@ -120,6 +117,11 @@
                             <span class="value" id="time-required">0h 0m</span>
                         </div>
                     </div>
+                </div>
+                
+                <div class="boost-section">
+                    <h3><i class="fas fa-rocket"></i> Speed Boost Breakdown</h3>
+                    <div id="boost-breakdown"></div>
                 </div>
                 
                 <div class="progress-section">

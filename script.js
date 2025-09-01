@@ -37,7 +37,11 @@ function applySpeedBoost(time, boostPercentage) {
     if (typeof time !== 'number' || isNaN(time) || time < 0) return 0;
     if (typeof boostPercentage !== 'number' || isNaN(boostPercentage) || boostPercentage <= 0) return time;
     
-    return Math.floor(time * (boostPercentage / 100));
+    // Apply speed boost: user input is the percentage of original time
+    // Example: User inputs 75% construction speed boost = 75% of original time (25% reduction)
+    // 100 seconds with 75% boost = 100 * 0.75 = 75 seconds
+    const actualTimeReduction = boostPercentage / 100;
+    return Math.floor(time * actualTimeReduction);
 }
 
 function getInputValue(elementId, defaultValue, min = null, max = null) {
@@ -53,6 +57,23 @@ function getInputValue(elementId, defaultValue, min = null, max = null) {
         return value;
     } catch (error) {
         console.error(`Error getting input value for ${elementId}:`, error);
+        return defaultValue;
+    }
+}
+
+function getDecimalInputValue(elementId, defaultValue, min = null, max = null) {
+    try {
+        const element = document.getElementById(elementId);
+        if (!element) return defaultValue;
+        
+        const value = parseFloat(element.value) || defaultValue;
+        
+        if (min !== null && value < min) return min;
+        if (max !== null && value > max) return max;
+        
+        return value;
+    } catch (error) {
+        console.error(`Error getting decimal input value for ${elementId}:`, error);
         return defaultValue;
     }
 }
@@ -83,8 +104,8 @@ function setElementDisplay(elementId, display) {
 function calculateRequirements() {
     try {
         const currentLevel = getInputValue('current-level', MIN_LEVEL, MIN_LEVEL, MAX_LEVEL);
-        const constructionSpeedBoost = getInputValue('construction-speed', 0, 0, 100);
-        const buildingType = document.getElementById('building-type')?.value || 'furnace';
+        const constructionSpeedBoost = getDecimalInputValue('construction-speed', 0, 0, 100);
+        
         const targetLevel = getInputValue('building-level', 1, 1, MAX_LEVEL);
         
         // Get input values
@@ -95,10 +116,10 @@ function calculateRequirements() {
         // Calculate speed boost
         let totalSpeedBoost = constructionSpeedBoost;
         if (vicePresident) {
-            totalSpeedBoost = Math.max(0, totalSpeedBoost - 10); // VP reduces time
+            totalSpeedBoost -= 10; // VP reduces time by 10% (makes it faster)
         }
         if (chiefOrderDoubleTime) {
-            totalSpeedBoost = Math.max(0, totalSpeedBoost - 20); // Chief Order reduces time
+            totalSpeedBoost -= 20; // Chief Order reduces time by 20% (makes it faster)
         }
         
         // Calculate zinman resource reduction (3% per level starting at level 1)
@@ -130,7 +151,7 @@ function calculateRequirements() {
         for (let level = currentLevel + 1; level <= targetLevel; level++) {
             let levelRequirements = { meat: 0, wood: 0, coal: 0, iron: 0, time: 0 };
             
-            // Always use furnace since it's the only building type available
+            // Get furnace level requirements
             if (gameData?.buildings?.furnace?.levels?.[level]) {
                 const levelData = gameData.buildings.furnace.levels[level];
                 levelRequirements = { ...levelData.requirements };
@@ -143,11 +164,16 @@ function calculateRequirements() {
             // Apply speed boost to this level's time
             const levelTime = applySpeedBoost(levelRequirements.time || 0, totalSpeedBoost);
             
-            // Add to totals
-            totalMeat += levelRequirements.meat || 0;
-            totalWood += levelRequirements.wood || 0;
-            totalCoal += levelRequirements.coal || 0;
-            totalIron += levelRequirements.iron || 0;
+            // Apply Zinman resource cost reduction
+            const applyZinmanReduction = (value) => {
+                return Math.floor(value * (1 - zinmanResourceReduction));
+            };
+            
+            // Add to totals (with Zinman reduction applied)
+            totalMeat += applyZinmanReduction(levelRequirements.meat || 0);
+            totalWood += applyZinmanReduction(levelRequirements.wood || 0);
+            totalCoal += applyZinmanReduction(levelRequirements.coal || 0);
+            totalIron += applyZinmanReduction(levelRequirements.iron || 0);
             totalTime += levelTime;
         }
         
@@ -176,7 +202,7 @@ function calculateRequirements() {
         }
         
         // Update the display
-        updateResultsDisplay(netRequirements, currentLevel, targetLevel, totalSpeedBoost);
+        updateResultsDisplay(netRequirements, currentLevel, targetLevel, totalSpeedBoost, constructionSpeedBoost, vicePresident, chiefOrderDoubleTime);
         
     } catch (error) {
         console.error('Error in calculateRequirements:', error);
@@ -322,14 +348,17 @@ function generateDependencyBreakdown(dependencies, constructionSpeedBoost = 0) {
     }
 }
 
-function updateResultsDisplay(requirements, currentLevel, targetLevel, boostPercentage) {
+function updateResultsDisplay(requirements, currentLevel, targetLevel, boostPercentage, constructionSpeedBoost, vicePresident, chiefOrderDoubleTime) {
     try {
         // Update the main results
-        setElementText('meat-needed', formatNumber(requirements.meat));
+        setElementText('food-needed', formatNumber(requirements.meat));
         setElementText('wood-needed', formatNumber(requirements.wood));
         setElementText('coal-needed', formatNumber(requirements.coal));
         setElementText('iron-needed', formatNumber(requirements.iron));
         setElementText('time-required', formatTime(requirements.time));
+        
+        // Generate boost breakdown
+        generateBoostBreakdown(constructionSpeedBoost, vicePresident, chiefOrderDoubleTime, boostPercentage);
         
         // Generate progress breakdown
         generateProgressBreakdown(requirements, currentLevel, targetLevel, boostPercentage);
@@ -388,6 +417,66 @@ function generateProgressBreakdown(requirements, currentLevel, targetLevel, boos
     }
 }
 
+function generateBoostBreakdown(constructionSpeedBoost, vicePresident, chiefOrderDoubleTime, totalSpeedBoost) {
+    try {
+        const breakdownDiv = document.getElementById('boost-breakdown');
+        if (!breakdownDiv) return;
+        
+        let html = '';
+        
+        // Base construction speed
+        if (constructionSpeedBoost > 0) {
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Base Construction Speed:</span>
+                    <span class="boost-value">${constructionSpeedBoost.toFixed(2)}%</span>
+                </div>
+            `;
+        }
+        
+        // Vice President bonus
+        if (vicePresident) {
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Vice President (+10%):</span>
+                    <span class="boost-value">+10.00%</span>
+                </div>
+            `;
+        }
+        
+        // Chief Order bonus
+        if (chiefOrderDoubleTime) {
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Chief Order Double Time (+20%):</span>
+                    <span class="boost-value">+20.00%</span>
+                </div>
+            `;
+        }
+        
+        // Total boost
+        html += `
+            <div class="boost-total">
+                Total Speed Boost: ${totalSpeedBoost.toFixed(2)}%
+            </div>
+        `;
+        
+        // Time reduction explanation
+        const timeReduction = (100 - totalSpeedBoost);
+        html += `
+            <div class="boost-item" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
+                <span class="boost-label">Effective Time Reduction:</span>
+                <span class="boost-value">${timeReduction.toFixed(2)}%</span>
+            </div>
+        `;
+        
+        breakdownDiv.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error generating boost breakdown:', error);
+    }
+}
+
 // Input validation functions
 function updateTargetLevelMin() {
     try {
@@ -416,7 +505,7 @@ function resetAllValues() {
     try {
         // Reset all input values to defaults
         const currentLevelInput = document.getElementById('current-level');
-        if (currentLevelInput) currentLevelInput.value = '15';
+        if (currentLevelInput) currentLevelInput.value = '20';
         
         const targetLevelInput = document.getElementById('building-level');
         if (targetLevelInput) targetLevelInput.value = '1';
@@ -430,8 +519,7 @@ function resetAllValues() {
         const vicePresidentCheckbox = document.getElementById('vice-president');
         if (vicePresidentCheckbox) vicePresidentCheckbox.checked = false;
         
-        const ministerEducationCheckbox = document.getElementById('minister-education');
-        if (ministerEducationCheckbox) ministerEducationCheckbox.checked = false;
+        
         
         const chiefOrderCheckbox = document.getElementById('chief-order-double-time');
         if (chiefOrderCheckbox) chiefOrderCheckbox.checked = false;
@@ -457,8 +545,7 @@ function saveSettings() {
         const settings = {
             currentLevel: getInputValue('current-level', MIN_LEVEL),
             targetLevel: getInputValue('building-level', 1),
-            constructionSpeed: getInputValue('construction-speed', 0),
-            researchSpeed: getInputValue('research-speed', 0)
+            constructionSpeed: getInputValue('construction-speed', 0)
         };
         
         localStorage.setItem('woCalculatorSettings', JSON.stringify(settings));
@@ -485,10 +572,7 @@ function loadSettings() {
                 const element = document.getElementById('construction-speed');
                 if (element) element.value = settings.constructionSpeed;
             }
-            if (settings.researchSpeed) {
-                const element = document.getElementById('research-speed');
-                if (element) element.value = settings.researchSpeed;
-            }
+            
         }
     } catch (error) {
         console.error('Error loading settings:', error);
@@ -525,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Save settings when inputs change
-        const inputs = ['building-level', 'construction-speed', 'research-speed'];
+        const inputs = ['building-level', 'construction-speed'];
         inputs.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
