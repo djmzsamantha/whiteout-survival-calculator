@@ -342,7 +342,7 @@ function generateDependencyBreakdown(dependencies, constructionSpeedBoost = 0) {
 function updateResultsDisplay(requirements, currentLevel, targetLevel, boostPercentage) {
     try {
         // Update the main results
-        setElementText('meat-needed', formatNumber(requirements.food));
+        setElementText('food-needed', formatNumber(requirements.food));
         setElementText('wood-needed', formatNumber(requirements.wood));
         setElementText('coal-needed', formatNumber(requirements.coal));
         setElementText('iron-needed', formatNumber(requirements.iron));
@@ -411,7 +411,8 @@ function saveSettings() {
         const settings = {
             currentLevel: getInputValue('current-level', MIN_LEVEL),
             targetLevel: getInputValue('building-level', 1),
-            constructionSpeed: getInputValue('construction-speed', 0)
+            constructionSpeed: getInputValue('construction-speed', 0),
+            researchSpeed: getInputValue('research-speed', 0)
         };
         
         localStorage.setItem('woCalculatorSettings', JSON.stringify(settings));
@@ -438,6 +439,10 @@ function loadSettings() {
                 const element = document.getElementById('construction-speed');
                 if (element) element.value = settings.constructionSpeed;
             }
+            if (settings.researchSpeed) {
+                const element = document.getElementById('research-speed');
+                if (element) element.value = settings.researchSpeed;
+            }
         }
     } catch (error) {
         console.error('Error loading settings:', error);
@@ -457,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Save settings when inputs change
-        const inputs = ['current-level', 'building-level', 'construction-speed'];
+        const inputs = ['current-level', 'building-level', 'construction-speed', 'research-speed'];
         inputs.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
