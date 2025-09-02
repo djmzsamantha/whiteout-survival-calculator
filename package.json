@@ -1,6 +1,6 @@
 {
   "name": "whiteout-survivor-calculator",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A comprehensive calculator for Whiteout Survivor game advancement planning",
   "main": "index.html",
   "scripts": {

@@ -29,8 +29,12 @@ function formatTime(seconds) {
         return `${days}d ${hours}h ${mins}m`;
     } else if (hours > 0) {
         return `${hours}h ${mins}m`;
+    } else if (mins > 0) {
+        const remainingSeconds = seconds % 60;
+        return remainingSeconds > 0 ? `${mins}m ${remainingSeconds}s` : `${mins}m`;
+    } else {
+        return `${seconds}s`;
     }
-    return `${mins}m`;
 }
 
 function applySpeedBoost(time, boostPercentage) {
@@ -112,6 +116,10 @@ function calculateRequirements() {
         const vicePresident = document.getElementById('vice-president')?.checked || false;
         const zinmanLevel = getInputValue('zinman-level', 0, 0, 5);
         const chiefOrderDoubleTime = document.getElementById('chief-order-double-time')?.checked || false;
+        const petSkillBuildersAide = parseInt(document.getElementById('pet-skill-builders-aide')?.value || 0);
+        const allianceAdaptiveTools = parseInt(document.getElementById('alliance-adaptive-tools')?.value || 0);
+        const islandFountainJoy = parseFloat(document.getElementById('island-fountain-joy')?.value || 0);
+        const islandOakTavern = parseFloat(document.getElementById('island-oak-tavern')?.value || 0);
         
         // Calculate speed boost
         let totalSpeedBoost = constructionSpeedBoost;
@@ -120,6 +128,19 @@ function calculateRequirements() {
         }
         if (chiefOrderDoubleTime) {
             totalSpeedBoost -= 20; // Chief Order reduces time by 20% (makes it faster)
+        }
+        if (petSkillBuildersAide > 0) {
+            totalSpeedBoost -= petSkillBuildersAide; // Pet Skill reduces time by the boost amount
+        }
+        if (allianceAdaptiveTools > 0) {
+            totalSpeedBoost -= allianceAdaptiveTools; // Alliance Adaptive Tools reduces time by the boost amount
+        }
+        if (islandFountainJoy > 0) {
+            totalSpeedBoost -= islandFountainJoy; // Island Fountain of Joy reduces time by the boost amount
+        }
+        
+        if (islandOakTavern > 0) {
+            totalSpeedBoost -= islandOakTavern; // Island Oak Tavern reduces time by the boost amount
         }
         
         // Calculate zinman resource reduction (3% per level starting at level 1)
@@ -202,7 +223,7 @@ function calculateRequirements() {
         }
         
         // Update the display
-        updateResultsDisplay(netRequirements, currentLevel, targetLevel, totalSpeedBoost, constructionSpeedBoost, vicePresident, chiefOrderDoubleTime);
+        updateResultsDisplay(netRequirements, currentLevel, targetLevel, totalSpeedBoost, constructionSpeedBoost, vicePresident, chiefOrderDoubleTime, petSkillBuildersAide, allianceAdaptiveTools, islandFountainJoy, islandOakTavern);
         
     } catch (error) {
         console.error('Error in calculateRequirements:', error);
@@ -348,7 +369,7 @@ function generateDependencyBreakdown(dependencies, constructionSpeedBoost = 0) {
     }
 }
 
-function updateResultsDisplay(requirements, currentLevel, targetLevel, boostPercentage, constructionSpeedBoost, vicePresident, chiefOrderDoubleTime) {
+function updateResultsDisplay(requirements, currentLevel, targetLevel, boostPercentage, constructionSpeedBoost, vicePresident, chiefOrderDoubleTime, petSkillBuildersAide, allianceAdaptiveTools, islandFountainJoy, islandOakTavern) {
     try {
         // Update the main results
         setElementText('food-needed', formatNumber(requirements.meat));
@@ -358,7 +379,7 @@ function updateResultsDisplay(requirements, currentLevel, targetLevel, boostPerc
         setElementText('time-required', formatTime(requirements.time));
         
         // Generate boost breakdown
-        generateBoostBreakdown(constructionSpeedBoost, vicePresident, chiefOrderDoubleTime, boostPercentage);
+        generateBoostBreakdown(constructionSpeedBoost, vicePresident, chiefOrderDoubleTime, petSkillBuildersAide, allianceAdaptiveTools, islandFountainJoy, islandOakTavern, boostPercentage);
         
         // Generate progress breakdown
         generateProgressBreakdown(requirements, currentLevel, targetLevel, boostPercentage);
@@ -417,7 +438,7 @@ function generateProgressBreakdown(requirements, currentLevel, targetLevel, boos
     }
 }
 
-function generateBoostBreakdown(constructionSpeedBoost, vicePresident, chiefOrderDoubleTime, totalSpeedBoost) {
+function generateBoostBreakdown(constructionSpeedBoost, vicePresident, chiefOrderDoubleTime, petSkillBuildersAide, allianceAdaptiveTools, islandFountainJoy, islandOakTavern, totalSpeedBoost) {
     try {
         const breakdownDiv = document.getElementById('boost-breakdown');
         if (!breakdownDiv) return;
@@ -450,6 +471,46 @@ function generateBoostBreakdown(constructionSpeedBoost, vicePresident, chiefOrde
                 <div class="boost-item">
                     <span class="boost-label">Chief Order Double Time (+20%):</span>
                     <span class="boost-value">+20.00%</span>
+                </div>
+            `;
+        }
+        
+        // Pet Skill bonus
+        if (petSkillBuildersAide > 0) {
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Pet Skill: Builder's Aide (+${petSkillBuildersAide}%):</span>
+                    <span class="boost-value">+${petSkillBuildersAide.toFixed(2)}%</span>
+                </div>
+            `;
+        }
+        
+        // Alliance Adaptive Tools bonus
+        if (allianceAdaptiveTools > 0) {
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Alliance Adaptive Tools (+${allianceAdaptiveTools}%):</span>
+                    <span class="boost-value">+${allianceAdaptiveTools.toFixed(2)}%</span>
+                </div>
+            `;
+        }
+        
+        // Island Fountain of Joy bonus
+        if (islandFountainJoy > 0) {
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Island: Fountain of Joy (+${islandFountainJoy}%):</span>
+                    <span class="boost-value">+${islandFountainJoy.toFixed(2)}%</span>
+                </div>
+            `;
+        }
+        
+        // Island Oak Tavern bonus
+        if (islandOakTavern > 0) {
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Island: Oak Tavern (+${islandOakTavern}%):</span>
+                    <span class="boost-value">+${islandOakTavern.toFixed(2)}%</span>
                 </div>
             `;
         }
@@ -524,6 +585,18 @@ function resetAllValues() {
         const chiefOrderCheckbox = document.getElementById('chief-order-double-time');
         if (chiefOrderCheckbox) chiefOrderCheckbox.checked = false;
         
+        const petSkillBuildersAideInput = document.getElementById('pet-skill-builders-aide');
+        if (petSkillBuildersAideInput) petSkillBuildersAideInput.value = '0';
+        
+        const allianceAdaptiveToolsInput = document.getElementById('alliance-adaptive-tools');
+        if (allianceAdaptiveToolsInput) allianceAdaptiveToolsInput.value = '0';
+        
+        const islandFountainJoyInput = document.getElementById('island-fountain-joy');
+        if (islandFountainJoyInput) islandFountainJoyInput.value = '0';
+        
+        const islandOakTavernInput = document.getElementById('island-oak-tavern');
+        if (islandOakTavernInput) islandOakTavernInput.value = '0';
+        
         // Hide results section
         setElementDisplay('results-section', 'none');
         setElementDisplay('dependencies-section', 'none');
@@ -543,23 +616,58 @@ function resetAllValues() {
 function resetTroopValues() {
     try {
         // Reset all troop input values to defaults
-        const troopTypeSelect = document.getElementById('troop-type');
-        if (troopTypeSelect) troopTypeSelect.value = 'infantryCamp';
         
-        const currentLevelInput = document.getElementById('troop-current-level');
-        if (currentLevelInput) currentLevelInput.value = '1';
-        
-        const targetLevelInput = document.getElementById('troop-target-level');
-        if (targetLevelInput) targetLevelInput.value = '1';
-        
+        // Reset training speed and alliance level
         const trainingSpeedInput = document.getElementById('training-speed');
         if (trainingSpeedInput) trainingSpeedInput.value = '100';
         
+        const allianceTrainingInput = document.getElementById('alliance-training-level');
+        if (allianceTrainingInput) allianceTrainingInput.value = '1';
+        
         const trainingCapacityInput = document.getElementById('training-capacity');
-        if (trainingCapacityInput) trainingCapacityInput.value = '1';
+        if (trainingCapacityInput) trainingCapacityInput.value = '100';
+        
+        // Reset time inputs
+        const totalDaysInput = document.getElementById('total-days');
+        if (totalDaysInput) totalDaysInput.value = '0';
+        
+        const totalHoursInput = document.getElementById('total-hours');
+        if (totalHoursInput) totalHoursInput.value = '0';
+        
+        const totalMinutesInput = document.getElementById('total-minutes');
+        if (totalMinutesInput) totalMinutesInput.value = '0';
+        
+        // Reset troop distribution percentages
+        const infantrySplitInput = document.getElementById('infantry-split');
+        if (infantrySplitInput) infantrySplitInput.value = '33';
+        
+        const marksmanSplitInput = document.getElementById('marksman-split');
+        if (marksmanSplitInput) marksmanSplitInput.value = '33';
+        
+        const lancerSplitInput = document.getElementById('lancer-split');
+        if (lancerSplitInput) lancerSplitInput.value = '34';
+        
+        // Reset target levels
+        const infantryLevelInput = document.getElementById('infantry-level');
+        if (infantryLevelInput) infantryLevelInput.value = '1';
+        
+        const marksmanLevelInput = document.getElementById('marksman-level');
+        if (marksmanLevelInput) marksmanLevelInput.value = '1';
+        
+        const lancerLevelInput = document.getElementById('lancer-level');
+        if (lancerLevelInput) lancerLevelInput.value = '1';
+        
+        // Reset even split checkbox
+        const evenSplitCheckbox = document.getElementById('even-split-checkbox');
+        if (evenSplitCheckbox) evenSplitCheckbox.checked = true;
+        
+        // Update the split total display
+        updateSplitTotal();
         
         // Hide results section
         setElementDisplay('troop-results-section', 'none');
+        
+        console.log('Troop training values reset successfully');
         
     } catch (error) {
         console.error('Error resetting troop values:', error);
@@ -572,12 +680,41 @@ function saveSettings() {
         const settings = {
             currentLevel: getInputValue('current-level', MIN_LEVEL),
             targetLevel: getInputValue('building-level', 1),
-            constructionSpeed: getInputValue('construction-speed', 0)
+            constructionSpeed: getInputValue('construction-speed', 0),
+            petSkillBuildersAide: parseInt(document.getElementById('pet-skill-builders-aide')?.value || 0),
+            allianceAdaptiveTools: parseInt(document.getElementById('alliance-adaptive-tools')?.value || 0),
+            islandFountainJoy: parseFloat(document.getElementById('island-fountain-joy')?.value || 0),
+            islandOakTavern: parseFloat(document.getElementById('island-oak-tavern')?.value || 0)
         };
         
         localStorage.setItem('woCalculatorSettings', JSON.stringify(settings));
     } catch (error) {
         console.error('Error saving settings:', error);
+    }
+}
+
+function saveTroopTrainingSettings() {
+    try {
+        const troopSettings = {
+            trainingSpeed: getDecimalInputValue('training-speed', 100, 0, 500),
+            allianceTrainingLevel: getInputValue('alliance-training-level', 1, 1, 5),
+            trainingCapacity: getInputValue('training-capacity', 1, 1, 9999),
+            totalDays: getInputValue('total-days', 0, 0, 365),
+            totalHours: getInputValue('total-hours', 0, 0, 23),
+            totalMinutes: getInputValue('total-minutes', 0, 0, 59),
+            infantrySplit: getInputValue('infantry-split', 33, 0, 100),
+            marksmanSplit: getInputValue('marksman-split', 33, 0, 100),
+            lancerSplit: getInputValue('lancer-split', 34, 0, 100),
+            infantryLevel: getInputValue('infantry-level', 1, 1, 11),
+            marksmanLevel: getInputValue('marksman-level', 1, 1, 11),
+            lancerLevel: getInputValue('lancer-level', 1, 1, 11),
+            evenSplitChecked: document.getElementById('even-split-checkbox')?.checked || true
+        };
+        
+        localStorage.setItem('woTroopTrainingSettings', JSON.stringify(troopSettings));
+        console.log('Troop training settings saved:', troopSettings);
+    } catch (error) {
+        console.error('Error saving troop training settings:', error);
     }
 }
 
@@ -599,15 +736,97 @@ function loadSettings() {
                 const element = document.getElementById('construction-speed');
                 if (element) element.value = settings.constructionSpeed;
             }
+            if (settings.petSkillBuildersAide !== undefined) {
+                const element = document.getElementById('pet-skill-builders-aide');
+                if (element) element.value = settings.petSkillBuildersAide;
+            }
+            if (settings.allianceAdaptiveTools !== undefined) {
+                const element = document.getElementById('alliance-adaptive-tools');
+                if (element) element.value = settings.allianceAdaptiveTools;
+            }
+            if (settings.islandFountainJoy !== undefined) {
+                const element = document.getElementById('island-fountain-joy');
+                if (element) element.value = settings.islandFountainJoy;
+            }
+            if (settings.islandOakTavern !== undefined) {
+                const element = document.getElementById('island-oak-tavern');
+                if (element) element.value = settings.islandOakTavern;
+            }
             
         }
+        
+        // Load troop training settings
+        const savedTroopSettings = localStorage.getItem('woTroopTrainingSettings');
+        if (savedTroopSettings) {
+            const troopSettings = JSON.parse(savedTroopSettings);
+            
+            // Load all troop training inputs
+            if (troopSettings.trainingSpeed) {
+                const element = document.getElementById('training-speed');
+                if (element) element.value = troopSettings.trainingSpeed;
+            }
+            if (troopSettings.allianceTrainingLevel) {
+                const element = document.getElementById('alliance-training-level');
+                if (element) element.value = troopSettings.allianceTrainingLevel;
+            }
+            if (troopSettings.trainingCapacity) {
+                const element = document.getElementById('training-capacity');
+                if (element) element.value = troopSettings.trainingCapacity;
+            }
+            if (troopSettings.totalDays) {
+                const element = document.getElementById('total-days');
+                if (element) element.value = troopSettings.totalDays;
+            }
+            if (troopSettings.totalHours) {
+                const element = document.getElementById('total-hours');
+                if (element) element.value = troopSettings.totalHours;
+            }
+            if (troopSettings.totalMinutes) {
+                const element = document.getElementById('total-minutes');
+                if (element) element.value = troopSettings.totalMinutes;
+            }
+            if (troopSettings.infantrySplit) {
+                const element = document.getElementById('infantry-split');
+                if (element) element.value = troopSettings.infantrySplit;
+            }
+            if (troopSettings.marksmanSplit) {
+                const element = document.getElementById('marksman-split');
+                if (element) element.value = troopSettings.marksmanSplit;
+            }
+            if (troopSettings.lancerSplit) {
+                const element = document.getElementById('lancer-split');
+                if (element) element.value = troopSettings.lancerSplit;
+            }
+            if (troopSettings.infantryLevel) {
+                const element = document.getElementById('infantry-level');
+                if (element) element.value = troopSettings.infantryLevel;
+            }
+            if (troopSettings.marksmanLevel) {
+                const element = document.getElementById('marksman-level');
+                if (element) element.value = troopSettings.marksmanLevel;
+            }
+            if (troopSettings.lancerLevel) {
+                const element = document.getElementById('lancer-level');
+                if (element) element.value = troopSettings.lancerLevel;
+            }
+            if (troopSettings.evenSplitChecked !== undefined) {
+                const element = document.getElementById('even-split-checkbox');
+                if (element) element.checked = troopSettings.evenSplitChecked;
+            }
+            
+            // Update the split total display
+            updateSplitTotal();
+            
+            console.log('Troop training settings loaded:', troopSettings);
+        }
+        
     } catch (error) {
         console.error('Error loading settings:', error);
     }
 }
 
-    // Plan strategy handling
-    function handlePlanStrategyChange(strategy) {
+// Plan strategy handling
+function handlePlanStrategyChange(strategy) {
         try {
             console.log('Plan strategy changed to:', strategy);
             
@@ -628,14 +847,23 @@ function loadSettings() {
                 trainingCapacityGroup.style.display = strategy === 'train' ? 'flex' : 'none';
             }
             
-            // Show/hide current level fields based on strategy
-            const currentLevelFields = document.querySelectorAll('.upgrade-field');
-            currentLevelFields.forEach(field => {
-                field.style.display = strategy === 'upgrade' || strategy === 'both' ? 'flex' : 'none';
+            // Show/hide upgrade coming soon message
+            const upgradeComingSoon = document.querySelector('.upgrade-coming-soon');
+            if (upgradeComingSoon) {
+                upgradeComingSoon.style.display = strategy === 'upgrade' ? 'flex' : 'none';
+            }
+            
+            // Show/hide training-specific inputs
+            const trainingInputs = document.querySelectorAll('.training-speed-group, .alliance-training-group, .training-capacity-group, .training-time-simple, .troop-splits-group, .troop-levels-group');
+            trainingInputs.forEach(input => {
+                input.style.display = strategy === 'train' ? 'flex' : 'none';
             });
             
-            // Show/hide quantity vs time fields based on training goal
-            updateTrainingGoalDisplay();
+            // Show/hide buttons based on strategy
+            const calculateBtn = document.getElementById('calculate-troops-btn');
+            const resetBtn = document.getElementById('reset-troops-btn');
+            if (calculateBtn) calculateBtn.style.display = strategy === 'train' ? 'flex' : 'none';
+            if (resetBtn) resetBtn.style.display = strategy === 'train' ? 'flex' : 'none';
             
         } catch (error) {
             console.error('Error handling plan strategy change:', error);
@@ -652,22 +880,223 @@ function handleTrainingGoalChange(goal) {
     }
 }
 
-// Update display based on training goal
-function updateTrainingGoalDisplay() {
-    const strategy = document.querySelector('input[name="plan-strategy"]:checked')?.value;
-    const goal = document.querySelector('input[name="training-goal"]:checked')?.value;
+
+
+// Update split total display and maintain 100% total
+function updateSplitTotal() {
+    try {
+        const infantrySplit = parseFloat(document.getElementById('infantry-split')?.value || 0);
+        const marksmanSplit = parseFloat(document.getElementById('marksman-split')?.value || 0);
+        const lancerSplit = parseFloat(document.getElementById('lancer-split')?.value || 0);
+        
+        const total = infantrySplit + marksmanSplit + lancerSplit;
+        const totalElement = document.getElementById('split-total');
+        
+        if (totalElement) {
+            totalElement.textContent = total.toFixed(2);
+            
+            // Color coding for total
+            if (total === 100) {
+                totalElement.style.color = '#28a745'; // Green for perfect 100%
+            } else if (total > 100) {
+                totalElement.style.color = '#dc3545'; // Red for over 100%
+            } else {
+                totalElement.style.color = '#ffc107'; // Yellow for under 100%
+            }
+        }
+    } catch (error) {
+        console.error('Error updating split total:', error);
+    }
+}
     
-    if (strategy === 'train') {
-        const quantityFields = document.querySelectorAll('.quantity-field');
-        const timeFields = document.querySelectorAll('.time-field');
+// Validate that total doesn't exceed 100%
+function validateTotal() {
+    try {
+        const infantrySplit = parseFloat(document.getElementById('infantry-split')?.value || 0);
+        const marksmanSplit = parseFloat(document.getElementById('marksman-split')?.value || 0);
+        const lancerSplit = parseFloat(document.getElementById('lancer-split')?.value || 0);
         
-        quantityFields.forEach(field => {
-            field.style.display = goal === 'quantity' ? 'flex' : 'none';
+        const total = infantrySplit + marksmanSplit + lancerSplit;
+        
+        // Update the total display
+        const totalElement = document.getElementById('split-total');
+        if (totalElement) {
+            totalElement.textContent = total.toFixed(2);
+            
+            // Color coding for total
+            if (total === 100) {
+                totalElement.style.color = '#28a745'; // Green for perfect 100%
+            } else if (total > 100) {
+                totalElement.style.color = '#dc3545'; // Red for over 100%
+            } else {
+                totalElement.style.color = '#ffc107'; // Yellow for under 100%
+            }
+        }
+        
+        // If total exceeds 100%, prevent the input from going over the limit
+        if (total > 100) {
+            // Find which input was just changed (has focus)
+            const activeElement = document.activeElement;
+            if (activeElement && activeElement.id && activeElement.id.includes('-split')) {
+                // Calculate the maximum allowed value for this input
+                const otherTotal = total - parseFloat(activeElement.value);
+                const maxAllowed = 100 - otherTotal;
+                
+                // If the input would exceed the limit, cap it
+                if (parseFloat(activeElement.value) > maxAllowed) {
+                    activeElement.value = Math.max(0, maxAllowed).toFixed(2);
+                }
+            }
+        }
+        
+        console.log('Total validation complete. Current total:', total);
+    } catch (error) {
+        console.error('Error validating total:', error);
+    }
+}
+
+
+
+// Update split display values
+function updateSplitDisplay(inputId) {
+    try {
+        const input = document.getElementById(inputId);
+        const value = parseFloat(input.value || 0);
+        const valueSpan = input.previousElementSibling;
+        
+        console.log('Updating display for:', inputId, 'Value:', value, 'ValueSpan:', valueSpan);
+        
+        if (valueSpan && valueSpan.classList.contains('split-value')) {
+            valueSpan.textContent = value.toFixed(2) + '%';
+            console.log('Display updated to:', valueSpan.textContent);
+        } else {
+            console.log('ValueSpan not found or wrong class:', valueSpan);
+        }
+    } catch (error) {
+        console.error('Error updating split display:', error);
+    }
+}
+
+// Set even split based on current total
+function setEvenSplit() {
+    try {
+        console.log('Setting even split - disabling inputs');
+        
+        // Get current total to distribute evenly
+        const currentTotal = parseFloat(document.getElementById('infantry-split')?.value || 0) + 
+                           parseFloat(document.getElementById('marksman-split')?.value || 0) + 
+                           parseFloat(document.getElementById('lancer-split')?.value || 0);
+        
+        // If no current total, use 100 as default
+        const totalToDistribute = currentTotal > 0 ? currentTotal : 100;
+        
+        // Calculate even distribution (as close as possible to equal)
+        const baseValue = Math.floor(totalToDistribute / 3);
+        const remainder = totalToDistribute - (baseValue * 3);
+        
+        document.getElementById('infantry-split').value = baseValue;
+        document.getElementById('marksman-split').value = baseValue;
+        document.getElementById('lancer-split').value = baseValue + remainder;
+        
+        // Disable inputs when even split is enabled
+        ['infantry-split', 'marksman-split', 'lancer-split'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.disabled = true;
+                console.log('Disabled input:', id);
+            } else {
+                console.log('Input not found:', id);
+            }
         });
         
-        timeFields.forEach(field => {
-            field.style.display = goal === 'time' ? 'flex' : 'none';
+        // Update total display
+        validateTotal();
+    } catch (error) {
+        console.error('Error setting even split:', error);
+    }
+}
+
+// Enable inputs when even split is disabled
+function enableSliders() {
+    try {
+        console.log('Enabling inputs');
+        ['infantry-split', 'marksman-split', 'lancer-split'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.disabled = false;
+                console.log('Enabled input:', id);
+            } else {
+                console.log('Input not found:', id);
+            }
         });
+    } catch (error) {
+        console.error('Error enabling inputs:', error);
+    }
+}
+
+// Initialize troops tab functionality
+function initializeTroopsTab() {
+    try {
+        console.log('Initializing troops tab...');
+        
+        // Set up percentage split input listeners
+        const splitInputs = ['infantry-split', 'marksman-split', 'lancer-split'];
+        splitInputs.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                // Remove existing listeners to prevent duplicates
+                input.removeEventListener('input', input._inputHandler);
+                
+                // Create new handler function
+                input._inputHandler = function() {
+                    console.log('Input changed:', id, 'Value:', this.value);
+                    
+                    // Only validate total if even split is not checked
+                    const evenSplitCheckbox = document.getElementById('even-split-checkbox');
+                    if (evenSplitCheckbox && !evenSplitCheckbox.checked) {
+                        validateTotal();
+                    }
+                };
+                
+                // Add the new listener
+                input.addEventListener('input', input._inputHandler);
+                console.log('Added listener for:', id);
+            } else {
+                console.log('Input not found during initialization:', id);
+            }
+        });
+        
+        // Set up even split checkbox listener
+        const evenSplitCheckbox = document.getElementById('even-split-checkbox');
+        if (evenSplitCheckbox) {
+            // Remove existing listener to prevent duplicates
+            evenSplitCheckbox.removeEventListener('change', evenSplitCheckbox._changeHandler);
+            
+            // Create new handler function
+            evenSplitCheckbox._changeHandler = function() {
+                console.log('Even split checkbox changed:', this.checked);
+                if (this.checked) {
+                    setEvenSplit();
+                } else {
+                    enableSliders();
+                }
+            };
+            
+            // Add the new listener
+            evenSplitCheckbox.addEventListener('change', evenSplitCheckbox._changeHandler);
+            console.log('Added even split checkbox listener');
+            
+            // Initialize state based on checkbox
+            if (evenSplitCheckbox.checked) {
+                setEvenSplit();
+            }
+        } else {
+            console.log('Even split checkbox not found during initialization');
+        }
+        
+        console.log('Troops tab initialization complete');
+    } catch (error) {
+        console.error('Error initializing troops tab:', error);
     }
 }
 
@@ -675,7 +1104,7 @@ function updateTrainingGoalDisplay() {
 function restoreActiveTab() {
     try {
         const savedTab = localStorage.getItem('wo_calculator_active_tab');
-        if (savedTab && (savedTab === 'construction' || savedTab === 'troops')) {
+        if (savedTab && (savedTab === 'construction' || savedTab === 'troops' || savedTab === 'research')) {
             console.log('Restoring active tab:', savedTab);
             switchTab(savedTab);
         } else {
@@ -693,7 +1122,7 @@ function restoreActiveTab() {
 function switchTab(tabName) {
     try {
         // Hide all tabs
-        const tabs = ['construction-tab', 'troops-tab'];
+        const tabs = ['construction-tab', 'troops-tab', 'research-tab'];
         tabs.forEach(tab => {
             const tabElement = document.getElementById(tab);
             if (tabElement) {
@@ -723,6 +1152,12 @@ function switchTab(tabName) {
         setElementDisplay('results-section', 'none');
         setElementDisplay('troop-results-section', 'none');
         
+        // Initialize troops tab if switching to it
+        if (tabName === 'troops') {
+            handlePlanStrategyChange('train');
+            initializeTroopsTab();
+        }
+        
         // Save the current tab to localStorage
         localStorage.setItem('wo_calculator_active_tab', tabName);
         
@@ -734,12 +1169,30 @@ function switchTab(tabName) {
 // Helper function to get troop level costs
 function getTroopLevelCost(troopType, level, resourceType) {
     try {
+        console.log(`Getting ${resourceType} for ${troopType} level ${level}`);
+        console.log('gameData available:', !!gameData);
+        console.log('troopTraining available:', !!gameData?.troopTraining);
+        console.log('troopType available:', !!gameData?.troopTraining?.[troopType]);
+        console.log('level available:', !!gameData?.troopTraining?.[troopType]?.tiers?.[level]);
+        
         if (gameData?.troopTraining?.[troopType]?.tiers?.[level]) {
             const tierData = gameData.troopTraining[troopType].tiers[level];
+            console.log('tierData:', tierData);
+            
             if (resourceType === 'time') {
-                return tierData.time || 0;
+                const timeValue = tierData.time || 0;
+                console.log(`Time value for ${troopType} level ${level}:`, timeValue);
+                return timeValue;
             } else {
-                return tierData.requirements[resourceType] || 0;
+                const resourceValue = tierData.requirements[resourceType] || 0;
+                console.log(`${resourceType} value for ${troopType} level ${level}:`, resourceValue);
+                return resourceValue;
+            }
+        } else {
+            console.error(`No data found for ${troopType} level ${level}`);
+            console.error('Available troop types:', Object.keys(gameData?.troopTraining || {}));
+            if (gameData?.troopTraining?.[troopType]) {
+                console.error(`Available levels for ${troopType}:`, Object.keys(gameData.troopTraining[troopType].tiers || {}));
             }
         }
         return 0;
@@ -755,13 +1208,25 @@ function calculateTroopRequirements() {
         console.log('Starting troop requirements calculation...');
         
         const trainingSpeed = getDecimalInputValue('training-speed', 100, 0, 500);
-        const trainingCapacity = getInputValue('training-capacity', 1, 1, 100);
+        const allianceTrainingLevel = getInputValue('alliance-training-level', 1, 1, 5);
+        const trainingCapacity = getInputValue('training-capacity', 1, 1, 9999);
         
-        // Get strategy and training goal
+        // Get additional troop speed boost inputs
+        const islandBarbecueStand = parseFloat(document.getElementById('troop-island-barbecue-stand')?.value || 0);
+        const islandSkiResort = parseFloat(document.getElementById('troop-island-ski-resort')?.value || 0);
+        
+        // Calculate total training speed including all boosts
+        // Each alliance level adds 5% to training speed
+        const allianceBoost = allianceTrainingLevel * 5;
+        const totalSpeedBoost = allianceBoost + islandBarbecueStand + islandSkiResort;
+        const totalTrainingSpeed = trainingSpeed + totalSpeedBoost;
+        
+
+        
+        // Get strategy
         const strategy = document.querySelector('input[name="plan-strategy"]:checked')?.value;
-        const trainingGoal = document.querySelector('input[name="training-goal"]:checked')?.value;
         
-        console.log('Strategy:', strategy, 'Training Goal:', trainingGoal);
+
         
         // Initialize combined totals
         let totalMeat = 0;
@@ -771,77 +1236,89 @@ function calculateTroopRequirements() {
         let totalTime = 0;
         
         // Get all troop plans
-        const troopPlans = document.querySelectorAll('.troop-plan');
+        const troopTypes = ['infantry', 'marksman', 'lancer'];
         const planDetails = [];
         
-        troopPlans.forEach(plan => {
-            const troopType = plan.getAttribute('data-troop');
-            const currentLevel = parseInt(plan.querySelector('.current-level')?.value || 1);
-            const targetLevel = parseInt(plan.querySelector('.target-level')?.value || 1);
-            const quantity = parseInt(plan.querySelector('.quantity')?.value || 1);
-            const trainingTime = parseFloat(plan.querySelector('.training-time')?.value || 1);
+        // Get total training time goal
+        const totalDaysInput = document.getElementById('total-days');
+        const totalHoursInput = document.getElementById('total-hours');
+        const totalMinutesInput = document.getElementById('total-minutes');
+        
+        const totalDays = parseInt(totalDaysInput?.value || 0);
+        const totalHours = parseInt(totalHoursInput?.value || 0);
+        const totalMinutes = parseInt(totalMinutesInput?.value || 0);
+        
+        const daysInMinutes = totalDays * 24 * 60;
+        const hoursInMinutes = totalHours * 60;
+        const totalTimeMinutes = daysInMinutes + hoursInMinutes + totalMinutes;
+        
+        // Ensure totalTimeMinutes is a number
+        if (isNaN(totalTimeMinutes)) {
+            console.error('ERROR: totalTimeMinutes is NaN!', { totalDays, totalHours, totalMinutes, daysInMinutes, hoursInMinutes });
+            throw new Error('Invalid time calculation');
+        }
+        
+        // Clear previous debug data
+        window.timeCalculationDebug = null;
+        window.troopCalculationDebug = [];
+        
+        // Store time calculation details for debug display
+        window.timeCalculationDebug = {
+            inputValues: { days: totalDaysInput?.value, hours: totalHoursInput?.value, minutes: totalMinutesInput?.value },
+            parsedValues: { totalDays, totalHours, totalMinutes },
+            calculation: {
+                daysInMinutes: `${totalDays} × 24 × 60 = ${daysInMinutes}`,
+                hoursInMinutes: `${totalHours} × 60 = ${hoursInMinutes}`,
+                minutes: totalMinutes,
+                total: `${daysInMinutes} + ${hoursInMinutes} + ${totalMinutes} = ${totalTimeMinutes}`
+            },
+            totalTimeMinutes,
+            totalTimeMinutesType: typeof totalTimeMinutes
+        };
+        
+        troopTypes.forEach(troopType => {
+            const targetLevel = parseInt(document.getElementById(`${troopType}-level`)?.value || 1);
+            const splitPercentage = parseFloat(document.getElementById(`${troopType}-split`)?.value || 33);
             
-            console.log(`Processing ${troopType} plan:`, { currentLevel, targetLevel, quantity, trainingTime });
+                    // Step 1: Get base training time per troop
+        const baseTimePerTroop = getTroopLevelCost(troopType, targetLevel, 'time');
+        console.log(`${troopType} level ${targetLevel} base time:`, baseTimePerTroop);
+        
+        if (baseTimePerTroop === 0) {
+            throw new Error(`No time data found for ${troopType} level ${targetLevel}`);
+        }
+        
+        // Step 2: Apply training speed boost to get actual time per troop
+        const boostedTimePerTroop = Math.floor(baseTimePerTroop / (totalTrainingSpeed / 100));
+        console.log(`${troopType} boosted time:`, boostedTimePerTroop);
+        
+        // Step 3: Calculate how many troops can be trained in the given time
+        // Apply the split percentage to the total time
+        const timeForThisTroopType = Math.floor(totalTimeMinutes * (splitPercentage / 100));
+        console.log(`${troopType} time allocation:`, timeForThisTroopType);
+        
+        // Convert boostedTimePerTroop from seconds to minutes for proper division
+        const boostedTimePerTroopMinutes = boostedTimePerTroop / 60;
+        const troopsThatCanBeTrained = Math.floor(timeForThisTroopType / boostedTimePerTroopMinutes);
+        console.log(`${troopType} troops that can be trained:`, troopsThatCanBeTrained);
             
-            // Calculate costs for this plan
-            let planMeat = 0;
-            let planWood = 0;
-            let planCoal = 0;
-            let planIron = 0;
-            let planTime = 0;
-            let actualQuantity = quantity;
             
-            if (strategy === 'upgrade' || strategy === 'both') {
-                // Calculate upgrade costs (sum of all levels from current to target-1)
-                if (currentLevel < targetLevel) {
-                    for (let level = currentLevel + 1; level <= targetLevel; level++) {
-                        planMeat += getTroopLevelCost(troopType, level, 'meat');
-                        planWood += getTroopLevelCost(troopType, level, 'wood');
-                        planCoal += getTroopLevelCost(troopType, level, 'coal');
-                        planIron += getTroopLevelCost(troopType, level, 'iron');
-                        planTime += getTroopLevelCost(troopType, level, 'time');
-                    }
-                    
-                    // Multiply by quantity
-                    planMeat *= quantity;
-                    planWood *= quantity;
-                    planCoal *= quantity;
-                    planIron *= quantity;
-                    planTime *= quantity;
-                }
-            } else if (strategy === 'train') {
-                // Calculate direct training costs (target level only)
-                const levelRequirements = {
-                    meat: getTroopLevelCost(troopType, targetLevel, 'meat'),
-                    wood: getTroopLevelCost(troopType, targetLevel, 'wood'),
-                    coal: getTroopLevelCost(troopType, targetLevel, 'coal'),
-                    iron: getTroopLevelCost(troopType, targetLevel, 'iron'),
-                    time: getTroopLevelCost(troopType, targetLevel, 'time')
-                };
-                
-                if (trainingGoal === 'quantity') {
-                    // User specified quantity, calculate time
-                    planMeat = levelRequirements.meat * quantity;
-                    planWood = levelRequirements.wood * quantity;
-                    planCoal = levelRequirements.coal * quantity;
-                    planIron = levelRequirements.iron * quantity;
-                    planTime = levelRequirements.time * quantity;
-                    actualQuantity = quantity;
-                } else {
-                    // User specified time, calculate quantity
-                    const baseTime = levelRequirements.time;
-                    const adjustedBaseTime = Math.floor(baseTime * (100 / trainingSpeed) / trainingCapacity);
-                    actualQuantity = Math.floor(trainingTime / adjustedBaseTime);
-                    
-                    if (actualQuantity < 1) actualQuantity = 1;
-                    
-                    planMeat = levelRequirements.meat * actualQuantity;
-                    planWood = levelRequirements.wood * actualQuantity;
-                    planCoal = levelRequirements.coal * actualQuantity;
-                    planIron = levelRequirements.iron * actualQuantity;
-                    planTime = levelRequirements.time * actualQuantity;
-                }
-            }
+            
+            // Step 4: Calculate resource costs for this troop type
+            const levelRequirements = {
+                meat: getTroopLevelCost(troopType, targetLevel, 'meat'),
+                wood: getTroopLevelCost(troopType, targetLevel, 'wood'),
+                coal: getTroopLevelCost(troopType, targetLevel, 'coal'),
+                iron: getTroopLevelCost(troopType, targetLevel, 'iron'),
+                time: boostedTimePerTroop
+            };
+            
+            // Step 5: Multiply resource cost per troop by number of troops
+            const planMeat = levelRequirements.meat * troopsThatCanBeTrained;
+            const planWood = levelRequirements.wood * troopsThatCanBeTrained;
+            const planCoal = levelRequirements.coal * troopsThatCanBeTrained;
+            const planIron = levelRequirements.iron * troopsThatCanBeTrained;
+            const planTime = levelRequirements.time * troopsThatCanBeTrained;
             
             // Add to totals
             totalMeat += planMeat;
@@ -853,21 +1330,48 @@ function calculateTroopRequirements() {
             // Store plan details
             planDetails.push({
                 troopType,
-                currentLevel,
                 targetLevel,
-                quantity: actualQuantity,
+                quantity: troopsThatCanBeTrained,
                 meat: planMeat,
                 wood: planWood,
                 coal: planCoal,
                 iron: planIron,
-                time: planTime
+                time: planTime,
+                timePerTroop: boostedTimePerTroop,
+                baseTimePerTroop: baseTimePerTroop,
+                speedMultiplier: (totalTrainingSpeed / 100).toFixed(2),
+                timeAllocation: timeForThisTroopType
             });
             
-            console.log(`${troopType} plan totals:`, { planMeat, planWood, planCoal, planIron, planTime, actualQuantity });
+            console.log(`${troopType} plan totals:`, { 
+                planMeat, planWood, planCoal, planIron, planTime, 
+                troopsThatCanBeTrained, boostedTimePerTroop, timeForThisTroopType 
+            });
         });
         
-        // Apply training speed and capacity to total time
-        const adjustedTime = Math.floor(totalTime * (100 / trainingSpeed) / trainingCapacity);
+        // Calculate total troops needed and number of batches
+        const totalTroopsNeeded = planDetails.reduce((sum, plan) => sum + plan.quantity, 0);
+        
+        // Calculate total batches: sum up batches for each troop type
+        const totalBatches = planDetails.reduce((sum, plan) => {
+            const batchesForThisType = plan.quantity / trainingCapacity;
+            return sum + batchesForThisType;
+        }, 0);
+        
+        // Round to 2 decimal places for display
+        const totalBatchesFormatted = Math.round(totalBatches * 100) / 100;
+        
+        // Time per batch: final time per troop × training capacity
+        const maxTimePerTroop = Math.max(...planDetails.map(plan => plan.timePerTroop));
+        const timePerBatch = maxTimePerTroop * trainingCapacity;
+        
+        console.log('Batch calculation debug:', {
+            maxTimePerTroop,
+            trainingCapacity,
+            timePerBatch,
+            timePerBatchInMinutes: timePerBatch / 60,
+            timePerBatchInHours: timePerBatch / 3600
+        });
         
         // Create combined requirements object
         const combinedRequirements = {
@@ -875,16 +1379,16 @@ function calculateTroopRequirements() {
             wood: totalWood,
             coal: totalCoal,
             iron: totalIron,
-            time: adjustedTime
+            time: totalTime, // This is the total resource time, not the user's goal time
+            totalTroops: totalTroopsNeeded,
+            numberOfGroups: totalBatchesFormatted,
+            timePerGroup: timePerBatch
         };
         
-        console.log('Combined totals:', { totalMeat, totalWood, totalCoal, totalIron, totalTime });
-        console.log('Adjusted time:', adjustedTime);
-        console.log('Final requirements:', combinedRequirements);
-        console.log('Plan details:', planDetails);
+
         
         // Update the display with combined results
-        updateTroopResultsDisplay(combinedRequirements, planDetails, trainingSpeed, trainingCapacity, adjustedTime);
+        updateTroopResultsDisplay(combinedRequirements, planDetails, trainingSpeed, allianceTrainingLevel, totalTrainingSpeed, trainingCapacity, totalTimeMinutes, islandBarbecueStand, islandSkiResort);
         
     } catch (error) {
         console.error('Error in calculateTroopRequirements:', error);
@@ -898,10 +1402,9 @@ function calculateTroopRequirements() {
     }
 }
 
-function updateTroopResultsDisplay(requirements, planDetails, trainingSpeed, trainingCapacity, adjustedTime) {
+function updateTroopResultsDisplay(requirements, planDetails, trainingSpeed, allianceTrainingLevel, totalTrainingSpeed, trainingCapacity, totalTimeMinutes, islandBarbecueStand, islandSkiResort) {
     try {
-        console.log('Updating troop results display with:', requirements);
-        console.log('Starting level:', startingLevel, 'Target level:', targetLevel);
+
         
         // Update the main results
         setElementText('troop-meat-needed', formatNumber(requirements.meat));
@@ -911,24 +1414,22 @@ function updateTroopResultsDisplay(requirements, planDetails, trainingSpeed, tra
         setElementText('troop-time-required', formatTime(requirements.time));
         
         // Generate troop boost breakdown
-        generateTroopBoostBreakdown(trainingSpeed, trainingCapacity, adjustedTime);
+        generateTroopBoostBreakdown(totalTrainingSpeed, trainingCapacity, requirements.time, trainingSpeed, allianceTrainingLevel, islandBarbecueStand, islandSkiResort);
         
         // Generate troop plan breakdown
-        generateTroopPlanBreakdown(planDetails, trainingSpeed);
+        generateTroopPlanBreakdown(planDetails, trainingSpeed, requirements.numberOfGroups, requirements.timePerGroup, trainingCapacity);
         
         // Show the results section
-        console.log('About to show troop results section...');
         setElementDisplay('troop-results-section', 'block');
-        console.log('Troop results section display set to block');
         
     } catch (error) {
         console.error('Error updating troop results display:', error);
         console.error('Error stack:', error.stack);
-        console.error('Function parameters:', { requirements, startingLevel, targetLevel, trainingSpeed, trainingCapacity, totalTime });
+        console.error('Function parameters:', { requirements, trainingSpeed, allianceTrainingLevel, totalTrainingSpeed, trainingCapacity, totalTimeMinutes });
     }
 }
 
-function generateTroopBoostBreakdown(trainingSpeed, trainingCapacity, totalTime) {
+function generateTroopBoostBreakdown(totalTrainingSpeed, trainingCapacity, totalTime, baseTrainingSpeed, allianceTrainingLevel, islandBarbecueStand, islandSkiResort) {
     try {
         const breakdownDiv = document.getElementById('troop-boost-breakdown');
         if (!breakdownDiv) return;
@@ -936,10 +1437,59 @@ function generateTroopBoostBreakdown(trainingSpeed, trainingCapacity, totalTime)
         let html = '';
         
         // Base training speed
+        if (baseTrainingSpeed > 100) {
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Base Training Speed:</span>
+                    <span class="boost-value">${baseTrainingSpeed.toFixed(2)}%</span>
+                </div>
+            `;
+        }
+        
+        // Alliance Advanced Training bonus
+        if (allianceTrainingLevel > 0) {
+            const allianceBoost = allianceTrainingLevel * 5;
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Alliance Advanced Training Level ${allianceTrainingLevel} (+${allianceBoost}%):</span>
+                    <span class="boost-value">+${allianceBoost.toFixed(2)}%</span>
+                </div>
+            `;
+        }
+        
+        // Island Barbecue Stand bonus
+        if (islandBarbecueStand > 0) {
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Island: Barbecue Stand (+${islandBarbecueStand}%):</span>
+                    <span class="boost-value">+${islandBarbecueStand.toFixed(2)}%</span>
+                </div>
+            `;
+        }
+        
+        // Island Ski Resort bonus
+        if (islandSkiResort > 0) {
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Island: Ski Resort (+${islandSkiResort}%):</span>
+                    <span class="boost-value">+${islandSkiResort.toFixed(2)}%</span>
+                </div>
+            `;
+        }
+        
+        // Total boost
         html += `
-            <div class="boost-item">
-                <span class="boost-label">Training Speed:</span>
-                <span class="boost-value">${trainingSpeed.toFixed(2)}%</span>
+            <div class="boost-total">
+                Total Training Speed: ${totalTrainingSpeed.toFixed(2)}%
+            </div>
+        `;
+        
+        // Time reduction explanation
+        const trainingSpeedIncrease = (totalTrainingSpeed - 100);
+        html += `
+            <div class="boost-item" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
+                <span class="boost-label">Effective Speed Increase:</span>
+                <span class="boost-value">+${trainingSpeedIncrease.toFixed(2)}%</span>
             </div>
         `;
         
@@ -985,19 +1535,11 @@ function generateTroopBoostBreakdown(trainingSpeed, trainingCapacity, totalTime)
         html += `
             <div class="boost-item">
                 <span class="boost-label">Training Capacity:</span>
-                <span class="boost-value">${trainingCapacity} troops</span>
+                <span class="boost-value">${trainingCapacity} troops per batch</span>
             </div>
         `;
         
-        // Total training time explanation
-        if (trainingCapacity > 1) {
-            html += `
-                <div class="boost-item" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
-                    <span class="boost-label">Effective Training Time:</span>
-                    <span class="boost-value">${(totalTime / trainingCapacity).toFixed(0)}s (${totalTime}s ÷ ${trainingCapacity})</span>
-                </div>
-            `;
-        }
+
         
         breakdownDiv.innerHTML = html;
         
@@ -1006,7 +1548,7 @@ function generateTroopBoostBreakdown(trainingSpeed, trainingCapacity, totalTime)
     }
 }
 
-function generateTroopPlanBreakdown(planDetails, trainingSpeed) {
+function generateTroopPlanBreakdown(planDetails, trainingSpeed, numberOfGroups, timePerGroup, trainingCapacity) {
     try {
         const breakdownDiv = document.getElementById('troop-progress-breakdown');
         if (!breakdownDiv) return;
@@ -1015,6 +1557,16 @@ function generateTroopPlanBreakdown(planDetails, trainingSpeed) {
             <div class="progress-item summary">
                 <h4>📊 Combined Training Plan Summary</h4>
                 <p><strong>Total Combined:</strong> Meat: ${formatNumber(planDetails.reduce((sum, plan) => sum + plan.meat, 0))} | Wood: ${formatNumber(planDetails.reduce((sum, plan) => sum + plan.wood, 0))} | Coal: ${formatNumber(planDetails.reduce((sum, plan) => sum + plan.coal, 0))} | Iron: ${formatNumber(planDetails.reduce((sum, plan) => sum + plan.iron, 0))} | Time: ${formatTime(planDetails.reduce((sum, plan) => sum + plan.time, 0))}${trainingSpeed > 0 ? ` (${trainingSpeed}% boost applied)` : ''}</p>
+            </div>
+        `;
+        
+        // Add training groups information
+        html += `
+            <div class="progress-item groups">
+                <h4>🔄 Training Information</h4>
+                <p><strong>Total Troops:</strong> ${planDetails.reduce((sum, plan) => sum + plan.quantity, 0)} troops</p>
+                <p><strong>Number of Batches:</strong> ${numberOfGroups} batches</p>
+                <p><strong>Time per Batch:</strong> ${formatTime(timePerGroup)}</p>
             </div>
         `;
         
@@ -1032,7 +1584,7 @@ function generateTroopPlanBreakdown(planDetails, trainingSpeed) {
                 html += `
                     <div class="plan-item">
                         <h5>${plan.troopType.charAt(0).toUpperCase() + plan.troopType.slice(1)} ${planType} (${levelRange})</h5>
-                        <p><strong>Quantity:</strong> ${plan.quantity} troops</p>
+                        <p><strong>Quantity:</strong> ${plan.quantity} troops | <strong>Time per Troop:</strong> ${formatTime(plan.baseTimePerTroop)} → ${formatTime(plan.timePerTroop)} (${plan.speedMultiplier}x speed) | <strong>Batches for this type:</strong> ${(plan.quantity / trainingCapacity).toFixed(2)}</p>
                         <p><strong>Costs:</strong> Meat: ${formatNumber(plan.meat)} | Wood: ${formatNumber(plan.wood)} | Coal: ${formatNumber(plan.coal)} | Iron: ${formatNumber(plan.iron)} | Time: ${formatTime(plan.time)}</p>
                     </div>
                 `;
@@ -1045,6 +1597,89 @@ function generateTroopPlanBreakdown(planDetails, trainingSpeed) {
         
     } catch (error) {
         console.error('Error generating troop progress breakdown:', error);
+    }
+}
+
+// Generate comprehensive debug information
+function generateTroopDebugInfo(requirements, planDetails, trainingSpeed, allianceTrainingLevel, totalTrainingSpeed, trainingCapacity, totalTimeMinutes) {
+    try {
+        const debugDiv = document.getElementById('troop-debug-info');
+        if (!debugDiv) return;
+        
+        let debugHtml = '<pre>';
+        
+        // Time calculation debug
+        if (window.timeCalculationDebug) {
+            debugHtml += '=== TIME CALCULATION DEBUG ===\n';
+            debugHtml += `Input Values: Days=${window.timeCalculationDebug.inputValues.days}, Hours=${window.timeCalculationDebug.inputValues.hours}, Minutes=${window.timeCalculationDebug.inputValues.minutes}\n`;
+            debugHtml += `Parsed Values: Days=${window.timeCalculationDebug.parsedValues.totalDays}, Hours=${window.timeCalculationDebug.parsedValues.totalHours}, Minutes=${window.timeCalculationDebug.parsedValues.totalMinutes}\n`;
+            debugHtml += `Calculation: ${window.timeCalculationDebug.calculation.daysInMinutes} + ${window.timeCalculationDebug.calculation.hoursInMinutes} + ${window.timeCalculationDebug.calculation.minutes} = ${window.timeCalculationDebug.totalTimeMinutes}\n`;
+            debugHtml += `Total Time Type: ${window.timeCalculationDebug.totalTimeMinutesType}\n\n`;
+        }
+        
+        // Input values
+        debugHtml += '=== INPUT VALUES ===\n';
+        debugHtml += `Base Training Speed: ${trainingSpeed}%\n`;
+        debugHtml += `Alliance Advanced Training Level: ${allianceTrainingLevel} (+${allianceTrainingLevel * 5}%)\n`;
+        debugHtml += `Total Training Speed: ${totalTrainingSpeed}%\n`;
+        debugHtml += `Training Capacity: ${trainingCapacity} troops per batch\n`;
+        debugHtml += `Total Time Goal: ${totalTimeMinutes} minutes\n`;
+        debugHtml += `Total Time Goal: ${Math.floor(totalTimeMinutes / 1440)} days, ${Math.floor((totalTimeMinutes % 1440) / 60)} hours, ${totalTimeMinutes % 60} minutes\n\n`;
+        
+        // Troop calculation debug
+        if (window.troopCalculationDebug) {
+            debugHtml += '=== TROOP CALCULATION DEBUG ===\n';
+            window.troopCalculationDebug.forEach(troop => {
+                debugHtml += `\n${troop.troopType.toUpperCase()}:\n`;
+                debugHtml += `  Target Level: ${troop.targetLevel}\n`;
+                debugHtml += `  Split Percentage: ${troop.splitPercentage}%\n`;
+                debugHtml += `  Base Time: ${troop.baseTimePerTroop}\n`;
+                debugHtml += `  Boosted Time: ${troop.boostedTimePerTroop}\n`;
+                debugHtml += `  Boosted Time (min): ${troop.boostedTimePerTroopMinutes}\n`;
+                debugHtml += `  Time Allocation: ${troop.timeForThisTroopType}\n`;
+                debugHtml += `  Troops That Can Be Trained: ${troop.troopsThatCanBeTrained}\n`;
+            });
+            debugHtml += '\n';
+        }
+        
+        // Individual troop calculations
+        debugHtml += '=== INDIVIDUAL TROOP CALCULATIONS ===\n';
+        planDetails.forEach((plan, index) => {
+            debugHtml += `\n${plan.troopType.toUpperCase()} (Level ${plan.targetLevel}):\n`;
+            debugHtml += `  Base Time Per Troop: ${plan.timePerTroop} seconds\n`;
+            debugHtml += `  Time Allocation: ${plan.timeAllocation} minutes\n`;
+            debugHtml += `  Troops That Can Be Trained: ${plan.quantity}\n`;
+            debugHtml += `  Resource Cost Per Troop: Meat=${Math.round(plan.meat/plan.quantity)}, Wood=${Math.round(plan.wood/plan.quantity)}, Coal=${Math.round(plan.coal/plan.quantity)}, Iron=${Math.round(plan.iron/plan.quantity)}\n`;
+            debugHtml += `  Total Resources: Meat=${plan.meat}, Wood=${plan.wood}, Coal=${plan.coal}, Iron=${plan.iron}\n`;
+        });
+        
+        // Batch calculations
+        debugHtml += '\n=== BATCH CALCULATIONS ===\n';
+        debugHtml += `Total Troops Needed: ${requirements.totalTroops}\n`;
+        debugHtml += `Training Capacity Per Batch: ${trainingCapacity} troops\n`;
+        debugHtml += `Number of Batches: ${requirements.numberOfGroups}\n`;
+        debugHtml += `Time Per Batch: ${requirements.timePerGroup} seconds\n`;
+        debugHtml += `Total Training Time: ${requirements.time} seconds\n`;
+        
+        // Final totals
+        debugHtml += '\n=== FINAL TOTALS ===\n';
+        debugHtml += `Total Meat: ${requirements.meat}\n`;
+        debugHtml += `Total Wood: ${requirements.wood}\n`;
+        debugHtml += `Total Coal: ${requirements.coal}\n`;
+        debugHtml += `Total Iron: ${requirements.iron}\n`;
+        debugHtml += `Total Time: ${requirements.time} seconds (${Math.floor(requirements.time / 60)} minutes, ${Math.floor(requirements.time / 3600)} hours)\n`;
+        
+        // Raw calculation data
+        debugHtml += '\n=== RAW CALCULATION DATA ===\n';
+        debugHtml += `JSON.stringify(requirements): ${JSON.stringify(requirements, null, 2)}\n\n`;
+        debugHtml += `JSON.stringify(planDetails): ${JSON.stringify(planDetails, null, 2)}\n`;
+        
+        debugHtml += '</pre>';
+        
+        debugDiv.innerHTML = debugHtml;
+        
+    } catch (error) {
+        console.error('Error generating troop debug info:', error);
     }
 }
 
@@ -1100,17 +1735,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Initialize strategy-based display with "Train New" as default
-    handlePlanStrategyChange('train');
+
+    
+            // Initialize strategy-based display will happen when troops tab is shown
+        
+
         
         // Add troop training event listeners
         const calculateTroopsBtn = document.getElementById('calculate-troops-btn');
-        console.log('Calculate troops button found:', !!calculateTroopsBtn);
         if (calculateTroopsBtn) {
-            calculateTroopsBtn.addEventListener('click', function() {
-                console.log('Calculate troops button clicked!');
-                calculateTroopRequirements();
-            });
+            calculateTroopsBtn.addEventListener('click', calculateTroopRequirements);
         }
         
         const resetTroopsBtn = document.getElementById('reset-troops-btn');
@@ -1128,13 +1762,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Save settings when inputs change
-        const inputs = ['building-level', 'construction-speed'];
+        const inputs = ['building-level', 'construction-speed', 'pet-skill-builders-aide'];
         inputs.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
                 element.addEventListener('input', saveSettings);
             }
         });
+        
+        // Save troop training settings when inputs change
+        const troopInputs = [
+            'training-speed', 'alliance-training-level', 'training-capacity',
+            'total-days', 'total-hours', 'total-minutes',
+            'infantry-split', 'marksman-split', 'lancer-split',
+            'infantry-level', 'marksman-level', 'lancer-level',
+            'troop-island-barbecue-stand', 'troop-island-ski-resort'
+        ];
+        troopInputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', saveTroopTrainingSettings);
+            }
+        });
+        
+        // Save even split checkbox state when changed
+        const evenSplitCheckbox = document.getElementById('even-split-checkbox');
+        if (evenSplitCheckbox) {
+            evenSplitCheckbox.addEventListener('change', saveTroopTrainingSettings);
+        }
         
     } catch (error) {
         console.error('Error in DOMContentLoaded:', error);

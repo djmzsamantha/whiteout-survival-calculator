@@ -28,6 +28,9 @@
             <button class="tab-button" data-tab="troops">
                 <i class="fas fa-shield-alt"></i> Troop Training
             </button>
+            <button class="tab-button" data-tab="research">
+                <i class="fas fa-flask"></i> Research
+            </button>
         </div>
 
         <!-- Input and Goal Section -->
@@ -43,6 +46,11 @@
                             <label for="current-level">Current Level:</label>
                             <input type="number" id="current-level" min="15" max="30" value="15">
                             <small id="current-level-help">Min: 15</small>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-arrow-up"></i>
+                            <label for="building-level">Target Furnace Level:</label>
+                            <input type="number" id="building-level" min="1" max="30" value="1">
                         </div>
                         <div class="input-group">
                             <i class="fas fa-hammer"></i>
@@ -75,9 +83,54 @@
                             <small>+20% construction speed</small>
                         </div>
                         <div class="input-group">
-                            <i class="fas fa-target"></i>
-                            <label for="building-level">Target Furnace Level:</label>
-                            <input type="number" id="building-level" min="1" max="30" value="1">
+                            <i class="fas fa-paw"></i>
+                            <label for="pet-skill-builders-aide">Pet Skill: Builder's Aide:</label>
+                            <select id="pet-skill-builders-aide">
+                                <option value="0">None</option>
+                                <option value="5">Level 1 (+5%)</option>
+                                <option value="7">Level 2 (+7%)</option>
+                                <option value="9">Level 3 (+9%)</option>
+                                <option value="12">Level 4 (+12%)</option>
+                                <option value="15">Level 5 (+15%)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-tools"></i>
+                            <label for="alliance-adaptive-tools">Alliance Adaptive Tools Training Level:</label>
+                            <select id="alliance-adaptive-tools">
+                                <option value="0">None</option>
+                                <option value="5">Level 1 (+5%)</option>
+                                <option value="10">Level 2 (+10%)</option>
+                                <option value="15">Level 3 (+15%)</option>
+                                <option value="20">Level 4 (+20%)</option>
+                                <option value="25">Level 5 (+25%)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-water"></i>
+                            <label for="island-fountain-joy">Island: Fountain of Joy:</label>
+                            <select id="island-fountain-joy">
+                                <option value="0">None</option>
+                                <option value="1">Level 1 (+1%)</option>
+                                <option value="1.5">Level 2 (+1.5%)</option>
+                                <option value="2.5">Level 3 (+2.5%)</option>
+                                <option value="3.5">Level 4 (+3.5%)</option>
+                                <option value="4">Level 5 (+4%)</option>
+                            </select>
+                            <small>% values are best guess</small>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-beer"></i>
+                            <label for="island-oak-tavern">Island: Oak Tavern:</label>
+                            <select id="island-oak-tavern">
+                                <option value="0">None</option>
+                                <option value="1">Level 1 (+1%)</option>
+                                <option value="1.5">Level 2 (+1.5%)</option>
+                                <option value="2.5">Level 3 (+2.5%)</option>
+                                <option value="3.5">Level 4 (+3.5%)</option>
+                                <option value="6">Level 5 (+6%)</option>
+                            </select>
+                            <small>% values are best guess</small>
                         </div>
                         <div class="input-group button-group">
                             <div class="button-container">
@@ -164,24 +217,25 @@
                                     <input type="radio" name="plan-strategy" value="upgrade">
                                     <span>Upgrade</span>
                                 </label>
-                                <label class="plan-option">
-                                    <input type="radio" name="plan-strategy" value="both">
-                                    <span>Mixed</span>
-                                </label>
                             </div>
                         </div>
                         
-                        <div class="input-group train-new-options" style="display: none;">
-                            <label>Training Goal:</label>
-                            <div class="goal-options">
-                                <label class="goal-option">
-                                    <input type="radio" name="training-goal" value="quantity" checked>
-                                    <span>Target Quantity</span>
-                                </label>
-                                <label class="goal-option">
-                                    <input type="radio" name="training-goal" value="time">
-                                    <span>Target Time</span>
-                                </label>
+                        <div class="input-group troop-levels-group">
+                            <i class="fas fa-target"></i>
+                            <label>Target Levels:</label>
+                            <div class="troop-levels">
+                                <div class="troop-level">
+                                    <label for="infantry-level">Infantry:</label>
+                                    <input type="number" id="infantry-level" min="1" max="11" value="1">
+                                </div>
+                                <div class="troop-level">
+                                    <label for="marksman-level">Marksman:</label>
+                                    <input type="number" id="marksman-level" min="1" max="11" value="1">
+                                </div>
+                                <div class="troop-level">
+                                    <label for="lancer-level">Lancer:</label>
+                                    <input type="number" id="lancer-level" min="1" max="11" value="1">
+                                </div>
                             </div>
                         </div>
                         
@@ -189,76 +243,95 @@
                             <i class="fas fa-bolt"></i>
                             <label for="training-speed">Training Speed (%):</label>
                             <input type="number" id="training-speed" min="0" max="500" step="0.01" value="100" placeholder="100.00">
-                            <small>100% = normal speed, 125% = 25% faster</small>
                         </div>
                         
-                        <div class="input-group training-capacity-group" style="display: none;">
+                        <div class="input-group training-capacity-group">
                             <i class="fas fa-users"></i>
                             <label for="training-capacity">Training Capacity:</label>
-                            <input type="number" id="training-capacity" min="1" max="100" value="1">
-                            <small>Troops trained simultaneously</small>
+                            <input type="number" id="training-capacity" min="1" max="9999" value="1">
                         </div>
                         
-                        <div class="input-group training-plans-group">
-                            <div class="training-plans-container">
-                                <!-- Infantry Plan -->
-                                <div class="troop-plan" data-troop="infantry">
-                                    <h4><i class="fas fa-shield-alt"></i> Infantry Plan</h4>
-                                    <div class="plan-inputs">
-                                        <div class="plan-row">
-                                            <label>Current Level:</label>
-                                            <input type="number" class="current-level" min="1" max="11" value="1">
-                                        </div>
-                                        <div class="plan-row">
-                                            <label>Target Level:</label>
-                                            <input type="number" class="target-level" min="1" max="11" value="1">
-                                        </div>
-                                        <div class="plan-row">
-                                            <label>Quantity:</label>
-                                            <input type="number" class="quantity" min="1" max="1000" value="1">
-                                        </div>
-                                    </div>
+                        <div class="input-group training-time-simple">
+                            <div class="training-time-row-1">
+                                <i class="fas fa-clock"></i>
+                                <label>Total Speedup Time:</label>
+                            </div>
+                            <div class="training-time-row-2">
+                                <label for="total-days">Days:</label>
+                                <input type="number" id="total-days" min="0" max="365" value="0" placeholder="0">
+                                <label for="total-hours">Hours:</label>
+                                <input type="number" id="total-hours" min="0" max="23" value="0" placeholder="0">
+                                <label for="total-minutes">Minutes:</label>
+                                <input type="number" id="total-minutes" min="0" max="59" value="0" placeholder="0">
+                            </div>
+                        </div>
+                        
+                        <div class="input-group troop-splits-group">
+                            <label>Troop Distribution (Percentage):</label>
+                            <div class="even-split-controls">
+                                <label for="even-split-checkbox">Even Split:</label>
+                                <input type="checkbox" id="even-split-checkbox" checked>
+                                <span class="total-display">Total: <span id="split-total">100</span>%</span>
+                            </div>
+                            <div class="troop-splits">
+                                <div class="troop-split">
+                                    <label for="infantry-split">Infantry:</label>
+                                    <input type="number" id="infantry-split" min="0" max="100" value="33" step="1">
                                 </div>
-                                
-                                <!-- Marksman Plan -->
-                                <div class="troop-plan" data-troop="marksman">
-                                    <h4><i class="fas fa-crosshairs"></i> Marksman Plan</h4>
-                                    <div class="plan-inputs">
-                                        <div class="plan-row">
-                                            <label>Current Level:</label>
-                                            <input type="number" class="current-level" min="1" max="11" value="1">
-                                        </div>
-                                        <div class="plan-row">
-                                            <label>Target Level:</label>
-                                            <input type="number" class="target-level" min="1" max="11" value="1">
-                                        </div>
-                                        <div class="plan-row">
-                                            <label>Quantity:</label>
-                                            <input type="number" class="quantity" min="1" max="1000" value="1">
-                                        </div>
-                                    </div>
+                                <div class="troop-split">
+                                    <label for="marksman-split">Marksman:</label>
+                                    <input type="number" id="marksman-split" min="0" max="100" value="33" step="1">
                                 </div>
-                                
-                                <!-- Lancer Plan -->
-                                <div class="troop-plan" data-troop="lancer">
-                                    <h4><i class="fas fa-horse"></i> Lancer Plan</h4>
-                                    <div class="plan-inputs">
-                                        <div class="plan-row">
-                                            <label>Current Level:</label>
-                                            <input type="number" class="current-level" min="1" max="11" value="1">
-                                        </div>
-                                        <div class="plan-row">
-                                            <label>Target Level:</label>
-                                            <input type="number" class="target-level" min="1" max="11" value="1">
-                                        </div>
-                                        <div class="plan-row">
-                                            <label>Quantity:</label>
-                                            <input type="number" class="quantity" min="1" max="1000" value="1">
-                                        </div>
-                                    </div>
+                                <div class="troop-split">
+                                    <label for="lancer-split">Lancer:</label>
+                                    <input type="number" id="lancer-split" min="0" max="100" value="33" step="1">
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="input-group upgrade-coming-soon" style="display: none;">
+                            <div class="coming-soon-container">
+                                <img src="WO_back.png" alt="Under Construction" class="coming-soon-image">
+                                <h3>Coming Soon!</h3>
+                                <p>Upgrade functionality is currently under development.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group alliance-training-group" style="display: none;">
+                            <i class="fas fa-flag"></i>
+                            <label for="alliance-training-level">Alliance Advanced Training Level:</label>
+                            <input type="number" id="alliance-training-level" min="1" max="5" value="1">
+                            <span class="helper-text">Level 1-5, each level adds 5% speed boost</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <i class="fas fa-fire"></i>
+                            <label for="troop-island-barbecue-stand">Island: Barbecue Stand:</label>
+                            <select id="troop-island-barbecue-stand">
+                                <option value="0">None</option>
+                                <option value="1">Level 1 (+1%)</option>
+                                <option value="2">Level 2 (+2%)</option>
+                                <option value="3">Level 3 (+3%)</option>
+                                <option value="4">Level 4 (+4%)</option>
+                                <option value="5">Level 5 (+5%)</option>
+                            </select>
+                            <small>% values are best guess</small>
+                        </div>
+                        
+                        <div class="input-group">
+                            <i class="fas fa-mountain"></i>
+                            <label for="troop-island-ski-resort">Island: Ski Resort:</label>
+                            <select id="troop-island-ski-resort">
+                                <option value="0">None</option>
+                                <option value="3">Level 1 (+3%)</option>
+                                <option value="6">Level 2 (+6%)</option>
+                                <option value="9">Level 3 (+9%)</option>
+                                <option value="12">Level 4 (+12%)</option>
+                                <option value="15">Level 5 (+15%)</option>
+                            </select>
+                            <small>% values are best guess</small>
+                        </div>
+                        
                         <div class="input-group button-group">
                             <div class="button-container">
                                 <button id="calculate-troops-btn" class="btn-primary" type="button">
@@ -317,6 +390,22 @@
                 <div class="progress-section">
                     <h3>Training Progress Breakdown</h3>
                     <div id="troop-progress-breakdown"></div>
+                </div>
+                
+                
+            </div>
+        </div>
+        
+        <!-- Research Tab -->
+        <div class="main-layout" id="research-tab" style="display: none;">
+            <div class="card status-bar">
+                <h2><i class="fas fa-flask"></i> Research</h2>
+                <div class="status-content">
+                    <div class="coming-soon-container">
+                        <img src="WO_back.png" alt="Under Construction" class="coming-soon-image">
+                        <h3>Coming Soon!</h3>
+                        <p>Research functionality is currently under development.</p>
+                    </div>
                 </div>
             </div>
         </div>

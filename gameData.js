@@ -3,7 +3,6 @@
 // Game data structure with requirements for buildings
 const gameData = {
     buildings: {
-        
         heroHall: {
             name: "Hero Hall",
             maxLevel: 1,

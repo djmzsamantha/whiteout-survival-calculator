@@ -175,6 +175,311 @@ body::before {
     /* These now use standard input-group styling */
 }
 
+/* Target Goal Inputs - EXACT same pattern as target levels */
+.target-goal-inputs {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.goal-input-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.goal-input-section label {
+    min-width: 180px;
+    flex-shrink: 0;
+}
+
+.goal-input-section input {
+    flex: 1;
+    max-width: 150px;
+}
+
+/* Time Inputs */
+.time-inputs {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.time-input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.time-input-group input {
+    width: 80px;
+    text-align: center;
+}
+
+.time-input-group label {
+    font-size: 11px;
+    color: #666;
+    margin: 0;
+    min-width: auto;
+}
+
+/* Troop Split Inputs */
+.troop-split-inputs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+}
+
+.troop-split-inputs > label {
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.split-input {
+    width: 80px;
+    padding: 4px 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+    background: #fff;
+}
+
+/* Hide troop split inputs by default */
+.input-group:has(label[for="infantry-split"]),
+.input-group:has(label[for="marksman-split"]),
+.input-group:has(label[for="lancer-split"]),
+.input-group:has(label[for="even-split-checkbox"]),
+.input-group:has(#split-total) {
+    display: none;
+}
+
+.split-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.split-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f5f5f5;
+}
+
+/* Style the total display */
+.even-split-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.total-display {
+    margin-left: auto;
+    color: #28a745;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+#split-total {
+    color: #28a745;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* Troop levels group styling - following construction tab pattern */
+/* LINT: Use flex-direction: column only for group containers, keep align-items: flex-start */
+.troop-levels-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.troop-levels-group > label {
+    align-self: flex-start;
+}
+
+
+
+.troop-levels {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.troop-level {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.troop-level label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.troop-level input {
+    width: 50px;
+    padding: 4px 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* Training time - simple two row layout */
+.training-time-simple {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.training-time-row-1 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.training-time-row-2 {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+
+
+
+
+/* Troop splits group styling - following same pattern as troop levels */
+.troop-splits-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+
+
+.troop-splits-group > label {
+    align-self: flex-start;
+}
+
+.even-split-controls {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+}
+
+.troop-splits {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.troop-split {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.troop-split label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.troop-split input {
+    width: 50px;
+    padding: 4px 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    text-align: center;
+    background: white;
+}
+
+
+
+.split-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.split-total span:first-child {
+    font-weight: 600;
+    color: #333;
+}
+
+#split-total {
+    color: #007bff;
+    font-weight: 700;
+}
+
+#even-split-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#even-split-btn:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+/* Coming Soon Container */
+.coming-soon-container {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.coming-soon-image {
+    max-width: 300px;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.coming-soon-container h3 {
+    font-size: 2rem;
+    color: #1976d2;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.coming-soon-container p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.coming-soon-container p:last-child {
+    font-size: 1rem;
+    color: #888;
+    font-style: italic;
+}
+
 /* Training Plans Group */
 .training-plans-group {
     grid-column: 1 / -1; /* Span full width */
@@ -197,7 +502,7 @@ body::before {
     border-radius: 8px;
     padding: 12px;
     transition: all 0.3s ease;
-    min-height: 140px;
+    min-height: 80px;
 }
 
 .troop-plan:hover {
@@ -216,8 +521,9 @@ body::before {
 }
 
 .plan-inputs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 8px;
 }
 
@@ -252,10 +558,41 @@ body::before {
 /* Field visibility based on strategy */
 .upgrade-field {
     display: flex;
+    justify-content: flex-start;
+}
+
+/* Upgrade coming soon styling */
+.upgrade-coming-soon .coming-soon-container {
+    text-align: center;
+    padding: 40px 20px;
+    width: 100%;
+}
+
+.upgrade-coming-soon .coming-soon-image {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.upgrade-coming-soon .coming-soon-container h3 {
+    font-size: 1.5rem;
+    color: #1976d2;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.upgrade-coming-soon .coming-soon-container p {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 10px;
+    line-height: 1.5;
 }
 
 .quantity-field {
     display: flex;
+    justify-content: flex-start;
 }
 
 .time-field {
@@ -265,6 +602,31 @@ body::before {
 /* Plan Breakdown Styling */
 .plan-breakdown {
     margin-top: 20px;
+}
+
+/* Debug Section Styling */
+.debug-section {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+}
+
+.debug-section h3 {
+    color: #dc3545;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.debug-section pre {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .plan-item {
@@ -393,6 +755,7 @@ body::before {
 .input-group {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 8px;
     background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
     padding: 8px 12px;
@@ -400,6 +763,47 @@ body::before {
     border: 1px solid rgba(255,255,255,0.5);
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     min-height: 36px;
+}
+
+/* 
+ * TROOP TRAINING CSS LINTING RULES - ENFORCE LEFT ALIGNMENT
+ * ❌ NEVER use: align-items: center, justify-content: center, flex-direction: column
+ * ✅ ALWAYS use: align-items: flex-start, justify-content: flex-start, flex-direction: row
+ * 🚫 NO vertical stacking, NO center alignment, NO complex nested layouts
+ */
+
+/* Compact input groups for troop training */
+#troops-tab .input-group {
+    padding: 4px 8px;
+    min-height: 28px;
+    gap: 6px;
+    margin-bottom: 4px;
+    align-items: flex-start;
+}
+
+
+
+#troops-tab .input-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Compact text and inputs for troop training */
+#troops-tab .input-group label {
+    font-size: 0.8rem;
+}
+
+#troops-tab .input-group input[type="number"] {
+    padding: 4px 6px;
+    font-size: 0.8rem;
+}
+
+#troops-tab .input-group small {
+    font-size: 0.7rem;
+}
+
+#troops-tab .input-group i {
+    font-size: 0.9rem;
+    width: 14px;
 }
 
 .input-group:has(.button-container) {
