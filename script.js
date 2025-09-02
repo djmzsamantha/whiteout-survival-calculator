@@ -539,6 +539,33 @@ function resetAllValues() {
     }
 }
 
+// Reset troop training values
+function resetTroopValues() {
+    try {
+        // Reset all troop input values to defaults
+        const troopTypeSelect = document.getElementById('troop-type');
+        if (troopTypeSelect) troopTypeSelect.value = 'infantryCamp';
+        
+        const currentLevelInput = document.getElementById('troop-current-level');
+        if (currentLevelInput) currentLevelInput.value = '1';
+        
+        const targetLevelInput = document.getElementById('troop-target-level');
+        if (targetLevelInput) targetLevelInput.value = '1';
+        
+        const trainingSpeedInput = document.getElementById('training-speed');
+        if (trainingSpeedInput) trainingSpeedInput.value = '100';
+        
+        const trainingCapacityInput = document.getElementById('training-capacity');
+        if (trainingCapacityInput) trainingCapacityInput.value = '1';
+        
+        // Hide results section
+        setElementDisplay('troop-results-section', 'none');
+        
+    } catch (error) {
+        console.error('Error resetting troop values:', error);
+    }
+}
+
 // Local storage functions
 function saveSettings() {
     try {
@@ -579,14 +606,472 @@ function loadSettings() {
     }
 }
 
+    // Plan strategy handling
+    function handlePlanStrategyChange(strategy) {
+        try {
+            console.log('Plan strategy changed to:', strategy);
+            
+            // Show/hide training goal options based on strategy
+            const trainNewOptions = document.querySelector('.train-new-options');
+            if (trainNewOptions) {
+                trainNewOptions.style.display = strategy === 'train' ? 'flex' : 'none';
+            }
+            
+            // Show/hide training boosts based on strategy
+            const trainingSpeedGroup = document.querySelector('.training-speed-group');
+            const trainingCapacityGroup = document.querySelector('.training-capacity-group');
+            
+            if (trainingSpeedGroup) {
+                trainingSpeedGroup.style.display = strategy === 'train' ? 'flex' : 'none';
+            }
+            if (trainingCapacityGroup) {
+                trainingCapacityGroup.style.display = strategy === 'train' ? 'flex' : 'none';
+            }
+            
+            // Show/hide current level fields based on strategy
+            const currentLevelFields = document.querySelectorAll('.upgrade-field');
+            currentLevelFields.forEach(field => {
+                field.style.display = strategy === 'upgrade' || strategy === 'both' ? 'flex' : 'none';
+            });
+            
+            // Show/hide quantity vs time fields based on training goal
+            updateTrainingGoalDisplay();
+            
+        } catch (error) {
+            console.error('Error handling plan strategy change:', error);
+        }
+    }
+
+// Training goal handling
+function handleTrainingGoalChange(goal) {
+    try {
+        console.log('Training goal changed to:', goal);
+        updateTrainingGoalDisplay();
+    } catch (error) {
+        console.error('Error handling training goal change:', error);
+    }
+}
+
+// Update display based on training goal
+function updateTrainingGoalDisplay() {
+    const strategy = document.querySelector('input[name="plan-strategy"]:checked')?.value;
+    const goal = document.querySelector('input[name="training-goal"]:checked')?.value;
+    
+    if (strategy === 'train') {
+        const quantityFields = document.querySelectorAll('.quantity-field');
+        const timeFields = document.querySelectorAll('.time-field');
+        
+        quantityFields.forEach(field => {
+            field.style.display = goal === 'quantity' ? 'flex' : 'none';
+        });
+        
+        timeFields.forEach(field => {
+            field.style.display = goal === 'time' ? 'flex' : 'none';
+        });
+    }
+}
+
+// Tab switching functionality
+function restoreActiveTab() {
+    try {
+        const savedTab = localStorage.getItem('wo_calculator_active_tab');
+        if (savedTab && (savedTab === 'construction' || savedTab === 'troops')) {
+            console.log('Restoring active tab:', savedTab);
+            switchTab(savedTab);
+        } else {
+            // Default to construction tab if no saved tab or invalid value
+            console.log('No saved tab found, defaulting to construction');
+            switchTab('construction');
+        }
+    } catch (error) {
+        console.error('Error restoring active tab:', error);
+        // Fallback to construction tab
+        switchTab('construction');
+    }
+}
+
+function switchTab(tabName) {
+    try {
+        // Hide all tabs
+        const tabs = ['construction-tab', 'troops-tab'];
+        tabs.forEach(tab => {
+            const tabElement = document.getElementById(tab);
+            if (tabElement) {
+                tabElement.style.display = 'none';
+            }
+        });
+        
+        // Remove active class from all tab buttons
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Show selected tab
+        const selectedTab = document.getElementById(tabName + '-tab');
+        if (selectedTab) {
+            selectedTab.style.display = 'flex';
+        }
+        
+        // Add active class to selected tab button
+        const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
+        if (selectedButton) {
+            selectedButton.classList.add('active');
+        }
+        
+        // Hide results sections when switching tabs
+        setElementDisplay('results-section', 'none');
+        setElementDisplay('troop-results-section', 'none');
+        
+        // Save the current tab to localStorage
+        localStorage.setItem('wo_calculator_active_tab', tabName);
+        
+    } catch (error) {
+        console.error('Error switching tabs:', error);
+    }
+}
+
+// Helper function to get troop level costs
+function getTroopLevelCost(troopType, level, resourceType) {
+    try {
+        if (gameData?.troopTraining?.[troopType]?.tiers?.[level]) {
+            const tierData = gameData.troopTraining[troopType].tiers[level];
+            if (resourceType === 'time') {
+                return tierData.time || 0;
+            } else {
+                return tierData.requirements[resourceType] || 0;
+            }
+        }
+        return 0;
+    } catch (error) {
+        console.error(`Error getting ${resourceType} cost for ${troopType} level ${level}:`, error);
+        return 0;
+    }
+}
+
+// Troop training calculation function
+function calculateTroopRequirements() {
+    try {
+        console.log('Starting troop requirements calculation...');
+        
+        const trainingSpeed = getDecimalInputValue('training-speed', 100, 0, 500);
+        const trainingCapacity = getInputValue('training-capacity', 1, 1, 100);
+        
+        // Get strategy and training goal
+        const strategy = document.querySelector('input[name="plan-strategy"]:checked')?.value;
+        const trainingGoal = document.querySelector('input[name="training-goal"]:checked')?.value;
+        
+        console.log('Strategy:', strategy, 'Training Goal:', trainingGoal);
+        
+        // Initialize combined totals
+        let totalMeat = 0;
+        let totalWood = 0;
+        let totalCoal = 0;
+        let totalIron = 0;
+        let totalTime = 0;
+        
+        // Get all troop plans
+        const troopPlans = document.querySelectorAll('.troop-plan');
+        const planDetails = [];
+        
+        troopPlans.forEach(plan => {
+            const troopType = plan.getAttribute('data-troop');
+            const currentLevel = parseInt(plan.querySelector('.current-level')?.value || 1);
+            const targetLevel = parseInt(plan.querySelector('.target-level')?.value || 1);
+            const quantity = parseInt(plan.querySelector('.quantity')?.value || 1);
+            const trainingTime = parseFloat(plan.querySelector('.training-time')?.value || 1);
+            
+            console.log(`Processing ${troopType} plan:`, { currentLevel, targetLevel, quantity, trainingTime });
+            
+            // Calculate costs for this plan
+            let planMeat = 0;
+            let planWood = 0;
+            let planCoal = 0;
+            let planIron = 0;
+            let planTime = 0;
+            let actualQuantity = quantity;
+            
+            if (strategy === 'upgrade' || strategy === 'both') {
+                // Calculate upgrade costs (sum of all levels from current to target-1)
+                if (currentLevel < targetLevel) {
+                    for (let level = currentLevel + 1; level <= targetLevel; level++) {
+                        planMeat += getTroopLevelCost(troopType, level, 'meat');
+                        planWood += getTroopLevelCost(troopType, level, 'wood');
+                        planCoal += getTroopLevelCost(troopType, level, 'coal');
+                        planIron += getTroopLevelCost(troopType, level, 'iron');
+                        planTime += getTroopLevelCost(troopType, level, 'time');
+                    }
+                    
+                    // Multiply by quantity
+                    planMeat *= quantity;
+                    planWood *= quantity;
+                    planCoal *= quantity;
+                    planIron *= quantity;
+                    planTime *= quantity;
+                }
+            } else if (strategy === 'train') {
+                // Calculate direct training costs (target level only)
+                const levelRequirements = {
+                    meat: getTroopLevelCost(troopType, targetLevel, 'meat'),
+                    wood: getTroopLevelCost(troopType, targetLevel, 'wood'),
+                    coal: getTroopLevelCost(troopType, targetLevel, 'coal'),
+                    iron: getTroopLevelCost(troopType, targetLevel, 'iron'),
+                    time: getTroopLevelCost(troopType, targetLevel, 'time')
+                };
+                
+                if (trainingGoal === 'quantity') {
+                    // User specified quantity, calculate time
+                    planMeat = levelRequirements.meat * quantity;
+                    planWood = levelRequirements.wood * quantity;
+                    planCoal = levelRequirements.coal * quantity;
+                    planIron = levelRequirements.iron * quantity;
+                    planTime = levelRequirements.time * quantity;
+                    actualQuantity = quantity;
+                } else {
+                    // User specified time, calculate quantity
+                    const baseTime = levelRequirements.time;
+                    const adjustedBaseTime = Math.floor(baseTime * (100 / trainingSpeed) / trainingCapacity);
+                    actualQuantity = Math.floor(trainingTime / adjustedBaseTime);
+                    
+                    if (actualQuantity < 1) actualQuantity = 1;
+                    
+                    planMeat = levelRequirements.meat * actualQuantity;
+                    planWood = levelRequirements.wood * actualQuantity;
+                    planCoal = levelRequirements.coal * actualQuantity;
+                    planIron = levelRequirements.iron * actualQuantity;
+                    planTime = levelRequirements.time * actualQuantity;
+                }
+            }
+            
+            // Add to totals
+            totalMeat += planMeat;
+            totalWood += planWood;
+            totalCoal += planCoal;
+            totalIron += planIron;
+            totalTime += planTime;
+            
+            // Store plan details
+            planDetails.push({
+                troopType,
+                currentLevel,
+                targetLevel,
+                quantity: actualQuantity,
+                meat: planMeat,
+                wood: planWood,
+                coal: planCoal,
+                iron: planIron,
+                time: planTime
+            });
+            
+            console.log(`${troopType} plan totals:`, { planMeat, planWood, planCoal, planIron, planTime, actualQuantity });
+        });
+        
+        // Apply training speed and capacity to total time
+        const adjustedTime = Math.floor(totalTime * (100 / trainingSpeed) / trainingCapacity);
+        
+        // Create combined requirements object
+        const combinedRequirements = {
+            meat: totalMeat,
+            wood: totalWood,
+            coal: totalCoal,
+            iron: totalIron,
+            time: adjustedTime
+        };
+        
+        console.log('Combined totals:', { totalMeat, totalWood, totalCoal, totalIron, totalTime });
+        console.log('Adjusted time:', adjustedTime);
+        console.log('Final requirements:', combinedRequirements);
+        console.log('Plan details:', planDetails);
+        
+        // Update the display with combined results
+        updateTroopResultsDisplay(combinedRequirements, planDetails, trainingSpeed, trainingCapacity, adjustedTime);
+        
+    } catch (error) {
+        console.error('Error in calculateTroopRequirements:', error);
+        console.error('Error stack:', error.stack);
+        console.error('Error details:', {
+            message: error.message,
+            name: error.name,
+            line: error.lineNumber || 'unknown'
+        });
+        alert('An error occurred while calculating troop requirements. Please try again.');
+    }
+}
+
+function updateTroopResultsDisplay(requirements, planDetails, trainingSpeed, trainingCapacity, adjustedTime) {
+    try {
+        console.log('Updating troop results display with:', requirements);
+        console.log('Starting level:', startingLevel, 'Target level:', targetLevel);
+        
+        // Update the main results
+        setElementText('troop-meat-needed', formatNumber(requirements.meat));
+        setElementText('troop-wood-needed', formatNumber(requirements.wood));
+        setElementText('troop-coal-needed', formatNumber(requirements.coal));
+        setElementText('troop-iron-needed', formatNumber(requirements.iron));
+        setElementText('troop-time-required', formatTime(requirements.time));
+        
+        // Generate troop boost breakdown
+        generateTroopBoostBreakdown(trainingSpeed, trainingCapacity, adjustedTime);
+        
+        // Generate troop plan breakdown
+        generateTroopPlanBreakdown(planDetails, trainingSpeed);
+        
+        // Show the results section
+        console.log('About to show troop results section...');
+        setElementDisplay('troop-results-section', 'block');
+        console.log('Troop results section display set to block');
+        
+    } catch (error) {
+        console.error('Error updating troop results display:', error);
+        console.error('Error stack:', error.stack);
+        console.error('Function parameters:', { requirements, startingLevel, targetLevel, trainingSpeed, trainingCapacity, totalTime });
+    }
+}
+
+function generateTroopBoostBreakdown(trainingSpeed, trainingCapacity, totalTime) {
+    try {
+        const breakdownDiv = document.getElementById('troop-boost-breakdown');
+        if (!breakdownDiv) return;
+        
+        let html = '';
+        
+        // Base training speed
+        html += `
+            <div class="boost-item">
+                <span class="boost-label">Training Speed:</span>
+                <span class="boost-value">${trainingSpeed.toFixed(2)}%</span>
+            </div>
+        `;
+        
+        // Speed interpretation
+        if (trainingSpeed > 100) {
+            const speedIncrease = trainingSpeed - 100;
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Speed Increase:</span>
+                    <span class="boost-value">+${speedIncrease.toFixed(2)}%</span>
+                </div>
+            `;
+        } else if (trainingSpeed < 100) {
+            const speedDecrease = 100 - trainingSpeed;
+            html += `
+                <div class="boost-item">
+                    <span class="boost-label">Speed Decrease:</span>
+                    <span class="boost-value">-${speedDecrease.toFixed(2)}%</span>
+                </div>
+            `;
+        }
+        
+        // Time calculation explanation
+        const timeMultiplier = trainingSpeed >= 100 ? (100 / trainingSpeed) : 1;
+        const timeReduction = trainingSpeed >= 100 ? ((trainingSpeed - 100) / trainingSpeed * 100) : 0;
+        
+        html += `
+            <div class="boost-total">
+                Time Multiplier: ${timeMultiplier.toFixed(3)}x
+            </div>
+        `;
+        
+        if (trainingSpeed > 100) {
+            html += `
+                <div class="boost-item" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
+                    <span class="boost-label">Time Reduction:</span>
+                    <span class="boost-value">${timeReduction.toFixed(2)}%</span>
+                </div>
+            `;
+        }
+        
+        // Training capacity information
+        html += `
+            <div class="boost-item">
+                <span class="boost-label">Training Capacity:</span>
+                <span class="boost-value">${trainingCapacity} troops</span>
+            </div>
+        `;
+        
+        // Total training time explanation
+        if (trainingCapacity > 1) {
+            html += `
+                <div class="boost-item" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
+                    <span class="boost-label">Effective Training Time:</span>
+                    <span class="boost-value">${(totalTime / trainingCapacity).toFixed(0)}s (${totalTime}s ÷ ${trainingCapacity})</span>
+                </div>
+            `;
+        }
+        
+        breakdownDiv.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error generating troop boost breakdown:', error);
+    }
+}
+
+function generateTroopPlanBreakdown(planDetails, trainingSpeed) {
+    try {
+        const breakdownDiv = document.getElementById('troop-progress-breakdown');
+        if (!breakdownDiv) return;
+        
+        let html = `
+            <div class="progress-item summary">
+                <h4>📊 Combined Training Plan Summary</h4>
+                <p><strong>Total Combined:</strong> Meat: ${formatNumber(planDetails.reduce((sum, plan) => sum + plan.meat, 0))} | Wood: ${formatNumber(planDetails.reduce((sum, plan) => sum + plan.wood, 0))} | Coal: ${formatNumber(planDetails.reduce((sum, plan) => sum + plan.coal, 0))} | Iron: ${formatNumber(planDetails.reduce((sum, plan) => sum + plan.iron, 0))} | Time: ${formatTime(planDetails.reduce((sum, plan) => sum + plan.time, 0))}${trainingSpeed > 0 ? ` (${trainingSpeed}% boost applied)` : ''}</p>
+            </div>
+        `;
+        
+        // Generate plan-by-plan breakdown
+        if (planDetails.length > 0) {
+            html += '<div class="plan-breakdown">';
+            html += '<h4>📈 Plan-by-Plan Breakdown:</h4>';
+            
+            planDetails.forEach((plan, index) => {
+                const planType = plan.currentLevel < plan.targetLevel ? 'Upgrade' : 'Direct Training';
+                const levelRange = plan.currentLevel < plan.targetLevel ? 
+                    `Level ${plan.currentLevel} → ${plan.targetLevel}` : 
+                    `Level ${plan.targetLevel}`;
+                
+                html += `
+                    <div class="plan-item">
+                        <h5>${plan.troopType.charAt(0).toUpperCase() + plan.troopType.slice(1)} ${planType} (${levelRange})</h5>
+                        <p><strong>Quantity:</strong> ${plan.quantity} troops</p>
+                        <p><strong>Costs:</strong> Meat: ${formatNumber(plan.meat)} | Wood: ${formatNumber(plan.wood)} | Coal: ${formatNumber(plan.coal)} | Iron: ${formatNumber(plan.iron)} | Time: ${formatTime(plan.time)}</p>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+        }
+        
+        breakdownDiv.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error generating troop progress breakdown:', error);
+    }
+}
+
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
     try {
+        console.log('DOM loaded, checking gameData...');
+        console.log('Game data available:', !!gameData);
+        console.log('Game data structure:', gameData);
+        
         // Load saved settings
         loadSettings();
         
         // Initialize target level minimum
         updateTargetLevelMin();
+        
+        // Add tab switching event listeners
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                switchTab(tabName);
+            });
+        });
+        
+        // Restore the previously active tab
+        restoreActiveTab();
         
         // Add event listeners
         const calculateBtn = document.getElementById('calculate-btn');
@@ -597,6 +1082,40 @@ document.addEventListener('DOMContentLoaded', function() {
         const resetBtn = document.getElementById('reset-btn');
         if (resetBtn) {
             resetBtn.addEventListener('click', resetAllValues);
+        }
+        
+            // Add plan strategy change listeners
+    const planStrategyRadios = document.querySelectorAll('input[name="plan-strategy"]');
+    planStrategyRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            handlePlanStrategyChange(this.value);
+        });
+    });
+    
+    // Add training goal change listeners
+    const trainingGoalRadios = document.querySelectorAll('input[name="training-goal"]');
+    trainingGoalRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            handleTrainingGoalChange(this.value);
+        });
+    });
+    
+    // Initialize strategy-based display with "Train New" as default
+    handlePlanStrategyChange('train');
+        
+        // Add troop training event listeners
+        const calculateTroopsBtn = document.getElementById('calculate-troops-btn');
+        console.log('Calculate troops button found:', !!calculateTroopsBtn);
+        if (calculateTroopsBtn) {
+            calculateTroopsBtn.addEventListener('click', function() {
+                console.log('Calculate troops button clicked!');
+                calculateTroopRequirements();
+            });
+        }
+        
+        const resetTroopsBtn = document.getElementById('reset-troops-btn');
+        if (resetTroopsBtn) {
+            resetTroopsBtn.addEventListener('click', resetTroopValues);
         }
         
         // Add current level change listener for target level validation

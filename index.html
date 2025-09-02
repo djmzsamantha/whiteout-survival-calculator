@@ -20,9 +20,19 @@
             <p style="color: #000000 !important; padding: 0 8px; margin: 0;">This site is in development and no values are verified. Use at own risk</p>
         </header>
 
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-button active" data-tab="construction">
+                <i class="fas fa-hammer"></i> Construction
+            </button>
+            <button class="tab-button" data-tab="troops">
+                <i class="fas fa-shield-alt"></i> Troop Training
+            </button>
+        </div>
+
         <!-- Input and Goal Section -->
         <!-- Main Layout Container -->
-        <div class="main-layout">
+        <div class="main-layout" id="construction-tab">
             <!-- User Information Section -->
             <div class="card status-bar">
                 <h2><i class="fas fa-user"></i> User Information</h2>
@@ -132,6 +142,181 @@
                 <div class="dependencies-section" id="dependencies-section" style="display: none;">
                     <h3><i class="fas fa-link"></i> Prerequisite Buildings</h3>
                     <div id="dependencies-breakdown"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Troop Training Tab -->
+        <div class="main-layout" id="troops-tab" style="display: none;">
+            <!-- Troop Training Section -->
+            <div class="card status-bar">
+                <h2><i class="fas fa-shield-alt"></i> Troop Training</h2>
+                <div class="status-content">
+                    <div class="input-grid">
+                        <div class="input-group plan-type-selector">
+                            <label>Strategy:</label>
+                            <div class="plan-options">
+                                <label class="plan-option">
+                                    <input type="radio" name="plan-strategy" value="train" checked>
+                                    <span>Train New</span>
+                                </label>
+                                <label class="plan-option">
+                                    <input type="radio" name="plan-strategy" value="upgrade">
+                                    <span>Upgrade</span>
+                                </label>
+                                <label class="plan-option">
+                                    <input type="radio" name="plan-strategy" value="both">
+                                    <span>Mixed</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group train-new-options" style="display: none;">
+                            <label>Training Goal:</label>
+                            <div class="goal-options">
+                                <label class="goal-option">
+                                    <input type="radio" name="training-goal" value="quantity" checked>
+                                    <span>Target Quantity</span>
+                                </label>
+                                <label class="goal-option">
+                                    <input type="radio" name="training-goal" value="time">
+                                    <span>Target Time</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group training-speed-group" style="display: none;">
+                            <i class="fas fa-bolt"></i>
+                            <label for="training-speed">Training Speed (%):</label>
+                            <input type="number" id="training-speed" min="0" max="500" step="0.01" value="100" placeholder="100.00">
+                            <small>100% = normal speed, 125% = 25% faster</small>
+                        </div>
+                        
+                        <div class="input-group training-capacity-group" style="display: none;">
+                            <i class="fas fa-users"></i>
+                            <label for="training-capacity">Training Capacity:</label>
+                            <input type="number" id="training-capacity" min="1" max="100" value="1">
+                            <small>Troops trained simultaneously</small>
+                        </div>
+                        
+                        <div class="input-group training-plans-group">
+                            <div class="training-plans-container">
+                                <!-- Infantry Plan -->
+                                <div class="troop-plan" data-troop="infantry">
+                                    <h4><i class="fas fa-shield-alt"></i> Infantry Plan</h4>
+                                    <div class="plan-inputs">
+                                        <div class="plan-row">
+                                            <label>Current Level:</label>
+                                            <input type="number" class="current-level" min="1" max="11" value="1">
+                                        </div>
+                                        <div class="plan-row">
+                                            <label>Target Level:</label>
+                                            <input type="number" class="target-level" min="1" max="11" value="1">
+                                        </div>
+                                        <div class="plan-row">
+                                            <label>Quantity:</label>
+                                            <input type="number" class="quantity" min="1" max="1000" value="1">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Marksman Plan -->
+                                <div class="troop-plan" data-troop="marksman">
+                                    <h4><i class="fas fa-crosshairs"></i> Marksman Plan</h4>
+                                    <div class="plan-inputs">
+                                        <div class="plan-row">
+                                            <label>Current Level:</label>
+                                            <input type="number" class="current-level" min="1" max="11" value="1">
+                                        </div>
+                                        <div class="plan-row">
+                                            <label>Target Level:</label>
+                                            <input type="number" class="target-level" min="1" max="11" value="1">
+                                        </div>
+                                        <div class="plan-row">
+                                            <label>Quantity:</label>
+                                            <input type="number" class="quantity" min="1" max="1000" value="1">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Lancer Plan -->
+                                <div class="troop-plan" data-troop="lancer">
+                                    <h4><i class="fas fa-horse"></i> Lancer Plan</h4>
+                                    <div class="plan-inputs">
+                                        <div class="plan-row">
+                                            <label>Current Level:</label>
+                                            <input type="number" class="current-level" min="1" max="11" value="1">
+                                        </div>
+                                        <div class="plan-row">
+                                            <label>Target Level:</label>
+                                            <input type="number" class="target-level" min="1" max="11" value="1">
+                                        </div>
+                                        <div class="plan-row">
+                                            <label>Quantity:</label>
+                                            <input type="number" class="quantity" min="1" max="1000" value="1">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group button-group">
+                            <div class="button-container">
+                                <button id="calculate-troops-btn" class="btn-primary" type="button">
+                                    <i class="fas fa-calculator"></i> Calculate Training Requirements
+                                </button>
+                                <button id="reset-troops-btn" class="btn-secondary" type="button">
+                                    <i class="fas fa-undo"></i> Reset Values
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Troop Training Results Section -->
+            <div class="card results" id="troop-results-section" style="display: none;">
+                <h2><i class="fas fa-chart-bar"></i> Training Requirements Summary</h2>
+                <div class="requirements-container">
+                    <div class="requirements-header">
+                        <h3>Resource Requirements</h3>
+                    </div>
+                    <div class="requirements-content">
+                        <div class="resource-row">
+                            <i class="fas fa-utensils"></i>
+                            <span class="label">Meat:</span>
+                            <span class="value" id="troop-meat-needed">0</span>
+                        </div>
+                        <div class="resource-row">
+                            <i class="fas fa-tree"></i>
+                            <span class="label">Wood:</span>
+                            <span class="value" id="troop-wood-needed">0</span>
+                        </div>
+                        <div class="resource-row">
+                            <i class="fas fa-fire"></i>
+                            <span class="label">Coal:</span>
+                            <span class="value" id="troop-coal-needed">0</span>
+                        </div>
+                        <div class="resource-row">
+                            <i class="fas fa-hammer"></i>
+                            <span class="label">Iron:</span>
+                            <span class="value" id="troop-iron-needed">0</span>
+                        </div>
+                        <div class="resource-row">
+                            <i class="fas fa-clock"></i>
+                            <span class="label">Time:</span>
+                            <span class="value" id="troop-time-required">0h 0m</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="boost-section">
+                    <h3><i class="fas fa-rocket"></i> Training Speed Breakdown</h3>
+                    <div id="troop-boost-breakdown"></div>
+                </div>
+                
+                <div class="progress-section">
+                    <h3>Training Progress Breakdown</h3>
+                    <div id="troop-progress-breakdown"></div>
                 </div>
             </div>
         </div>
