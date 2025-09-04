@@ -1826,10 +1826,15 @@ function planBuildingDependencies(targetBuilding, startLevel, endLevel, floorLev
         // 3) Collapse to max level per building
         const maxReqs = collapseToMaxLevel(allReqs);
         
-        // 4) Expand to include intermediate levels from floor to max
-        const expanded = expandWithFloor(maxReqs, floorLevel);
+        // 4) Expand to include intermediate levels from floor to max (excluding target building)
+        const expanded = expandWithFloor(maxReqs, floorLevel, targetBuilding);
         
-        // 5) Sort by building code then level
+        // 5) Add target building levels (only the levels that need to be built: current+1 to target)
+        for (let level = startLevel + 1; level <= endLevel; level++) {
+            expanded.push({ building: targetBuilding, level: level });
+        }
+        
+        // 6) Sort by building code then level
         expanded.sort((a, b) => {
             if (a.building !== b.building) {
                 return a.building.localeCompare(b.building);
@@ -1884,11 +1889,16 @@ function collapseToMaxLevel(reqs) {
     return maxReqs;
 }
 
-function expandWithFloor(maxReqs, floorLevel) {
+function expandWithFloor(maxReqs, floorLevel, excludeBuilding = null) {
     const expanded = [];
     const floor = Math.max(1, floorLevel);
     
     Object.entries(maxReqs).forEach(([building, reqLevel]) => {
+        // Skip the target building - it will be handled separately
+        if (building === excludeBuilding) {
+            return;
+        }
+        
         if (reqLevel >= floor) {
             for (let level = floor; level <= reqLevel; level++) {
                 expanded.push({ building, level });
