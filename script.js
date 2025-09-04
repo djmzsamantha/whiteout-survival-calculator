@@ -381,7 +381,7 @@ function generateDependencyBreakdown(dependencies, constructionSpeedBoost = 0, c
             
             const isInnerCity = building.innerCity || false;
             const buildingName = building.name || group.building;
-            const statusText = isInnerCity ? " (Inner City - Cost Not Included)" : " (Cost Included in Total)";
+            const statusText = isInnerCity ? " (Inner City - Cost Not Included)" : "";
             
             // All buildings show the range from current level to max required level
             const displayLevel = `${currentLevel}-${group.maxLevel}`;
@@ -1431,7 +1431,7 @@ function updateTroopResultsDisplay(requirements, planDetails, trainingSpeed, all
         setElementText('troop-time-required', formatTime(requirements.time));
         
         // Generate troop boost breakdown
-        generateTroopBoostBreakdown(totalTrainingSpeed, trainingCapacity, requirements.time, trainingSpeed, allianceTrainingLevel, islandBarbecueStand, islandSkiResort);
+        generateTroopBoostBreakdown(totalTrainingSpeed, trainingCapacity, requirements.time, trainingSpeed, allianceTrainingLevel, islandBarbecueStand, islandSkiResort, planDetails);
         
         // Generate troop plan breakdown
         generateTroopPlanBreakdown(planDetails, trainingSpeed, requirements.numberOfGroups, requirements.timePerGroup, trainingCapacity);
@@ -1446,7 +1446,7 @@ function updateTroopResultsDisplay(requirements, planDetails, trainingSpeed, all
     }
 }
 
-function generateTroopBoostBreakdown(totalTrainingSpeed, trainingCapacity, totalTime, baseTrainingSpeed, allianceTrainingLevel, islandBarbecueStand, islandSkiResort) {
+function generateTroopBoostBreakdown(totalTrainingSpeed, trainingCapacity, totalTime, baseTrainingSpeed, allianceTrainingLevel, islandBarbecueStand, islandSkiResort, planDetails) {
     try {
         const breakdownDiv = document.getElementById('troop-boost-breakdown');
         if (!breakdownDiv) return;
@@ -1454,7 +1454,7 @@ function generateTroopBoostBreakdown(totalTrainingSpeed, trainingCapacity, total
         let html = '';
         
         // Base training speed
-        if (baseTrainingSpeed > 100) {
+        if (baseTrainingSpeed !== 100) {
             html += `
                 <div class="boost-item">
                     <span class="boost-label">Base Training Speed:</span>
@@ -1510,28 +1510,10 @@ function generateTroopBoostBreakdown(totalTrainingSpeed, trainingCapacity, total
             </div>
         `;
         
-        // Speed interpretation
-        if (trainingSpeed > 100) {
-            const speedIncrease = trainingSpeed - 100;
-            html += `
-                <div class="boost-item">
-                    <span class="boost-label">Speed Increase:</span>
-                    <span class="boost-value">+${speedIncrease.toFixed(2)}%</span>
-                </div>
-            `;
-        } else if (trainingSpeed < 100) {
-            const speedDecrease = 100 - trainingSpeed;
-            html += `
-                <div class="boost-item">
-                    <span class="boost-label">Speed Decrease:</span>
-                    <span class="boost-value">-${speedDecrease.toFixed(2)}%</span>
-                </div>
-            `;
-        }
         
         // Time calculation explanation
-        const timeMultiplier = trainingSpeed >= 100 ? (100 / trainingSpeed) : 1;
-        const timeReduction = trainingSpeed >= 100 ? ((trainingSpeed - 100) / trainingSpeed * 100) : 0;
+        const timeMultiplier = baseTrainingSpeed >= 100 ? (100 / baseTrainingSpeed) : 1;
+        const timeReduction = baseTrainingSpeed >= 100 ? ((baseTrainingSpeed - 100) / baseTrainingSpeed * 100) : 0;
         
         html += `
             <div class="boost-total">
@@ -1539,7 +1521,7 @@ function generateTroopBoostBreakdown(totalTrainingSpeed, trainingCapacity, total
             </div>
         `;
         
-        if (trainingSpeed > 100) {
+        if (baseTrainingSpeed > 100) {
             html += `
                 <div class="boost-item" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1);">
                     <span class="boost-label">Time Reduction:</span>
@@ -1547,6 +1529,15 @@ function generateTroopBoostBreakdown(totalTrainingSpeed, trainingCapacity, total
                 </div>
             `;
         }
+        
+        // Time per troop information
+        const avgTimePerTroop = totalTime > 0 ? totalTime / (planDetails.reduce((sum, plan) => sum + plan.quantity, 0)) : 0;
+        html += `
+            <div class="boost-item">
+                <span class="boost-label">Average Time per Troop:</span>
+                <span class="boost-value">${formatTime(avgTimePerTroop)}</span>
+            </div>
+        `;
         
         // Training capacity information
         html += `
@@ -1976,7 +1967,7 @@ function generateDependencyBreakdownFromPlan(dependencyPlan, constructionSpeedBo
             
             const isInnerCity = building.innerCity || false;
             const buildingName = building.name || buildingCode;
-            const statusText = isInnerCity ? " (Inner City - Cost Not Included)" : " (Cost Included in Total)";
+            const statusText = isInnerCity ? " (Inner City - Cost Not Included)" : "";
             
             // Calculate costs for this building
             let cost = { meat: 0, wood: 0, coal: 0, iron: 0, time: 0 };
